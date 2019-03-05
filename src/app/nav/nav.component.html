@@ -1,0 +1,17 @@
+<mat-sidenav-container class="sidenav-container">
+    <mat-sidenav #drawer class="sidenav" position="end" fixedInViewport="false" [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'" [mode]="(isHandset$ | async) ? 'over' : 'side'" [opened]="!(isHandset$ | async)">
+        <mat-toolbar color="red">שלבי טיפול</mat-toolbar>
+        <mat-nav-list>
+            <a mat-list-item href="" [routerLink]="['treatment']">קבלה</a>
+            <a mat-list-item href="" [routerLink]="['followup']">מעקב</a>
+            <a mat-list-item href="" [routerLink]="['prevention']">מניעה</a>
+            <a mat-list-item href="" [routerLink]="['treatment']">טיפול</a>
+            <a mat-list-item href="" [routerLink]="['treatment']">חבישות</a>
+            <a mat-list-item href="" [routerLink]="['treatment']">סיכום</a>
+
+        </mat-nav-list>
+    </mat-sidenav>
+    <mat-sidenav-content>
+        <router-outlet></router-outlet>
+    </mat-sidenav-content>
+</mat-sidenav-container>
