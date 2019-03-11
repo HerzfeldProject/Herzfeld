@@ -21,12 +21,12 @@ export class AppComponent implements OnInit {
     };
     ngOnInit() {
         this.myOptions = [
-            { id: 1, name: 'Option 1' },
-            { id: 2, name: 'Option 2' },
-            { id: 3, name: 'Option 3' },
-            { id: 4, name: 'Option 4' },
-            { id: 5, name: '25825' },
-            { id: 6, name: '31167' },
+            { id: 1, name: '123456789' },
+            { id: 2, name: '545454545' },
+            { id: 3, name: '111111111' },
+            { id: 4, name: '000000000' },
+            { id: 5, name: '258255454' },
+            { id: 6, name: '311674564' },
 
         ];
     }

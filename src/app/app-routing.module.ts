@@ -1,15 +1,14 @@
 import { NgModule} from '@angular/core';
 import {Route, RouterModule} from '@angular/router';
-import {FollowupComponent} from './followup/followup.component';
-import {PreventionComponent} from './prevention/prevention.component';
-import {TreatmentComponent} from './treatment/treatment.component';
-import { DashboardComponent } from './followup/dashboard/dashboard.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { FollowUpDashboardComponent } from './follow-up-dashboard/follow-up-dashboard.component';
 
 const routes: Route[] = [
-  {path: '', pathMatch: 'full', redirectTo: 'followup'},
-  {path: 'followup', component: DashboardComponent},
-  {path: 'prevention', component: PreventionComponent},
-  {path: 'treatment', component: TreatmentComponent},
+  {path: '', pathMatch: 'full', redirectTo: 'admission'},
+  {path: 'admission', component: DashboardComponent},
+  {path: 'followup' , component: FollowUpDashboardComponent},
+  {path: 'prevention', component: DashboardComponent},
+  {path: 'treatment', component: DashboardComponent},
 ];
 
 @NgModule({
