@@ -13,6 +13,9 @@ import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, Mat
 import { DashboardComponent } from './followup/dashboard/dashboard.component';
 import { MultiselectDropdownModule } from 'angular-2-dropdown-multiselect';
 import { ChartsModule } from 'ng2-charts';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
+
 
 @NgModule({
   declarations: [
@@ -26,6 +29,8 @@ import { ChartsModule } from 'ng2-charts';
     MatDatepickerToggle
   ],
   imports: [
+    FormsModule,
+    ReactiveFormsModule,
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
@@ -43,9 +48,14 @@ import { ChartsModule } from 'ng2-charts';
     MatSelectModule,
     MatOptionModule,
     MultiselectDropdownModule,
-    ChartsModule
+    ChartsModule,
+    OwlDateTimeModule,
+    OwlNativeDateTimeModule
+
   ],
   exports:[
+    FormsModule,
+    ReactiveFormsModule,
     MatFormFieldModule,
   ],
   providers: [],

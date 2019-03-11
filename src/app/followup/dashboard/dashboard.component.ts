@@ -36,9 +36,73 @@ export class DashboardComponent implements OnInit {
   constructor(private breakpointObserver: BreakpointObserver) {
 
   }
+  title = 'app';
+  public pieChartLabels:string[] = ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"];
+  public pieChartData:number[] =  [12, 19, 3, 5, 2, 3];
+  public pieChartType:string = 'pie';
+  public pieChartOptions:any = {'backgroundColor': [
+    'rgba(255, 99, 132, 0.2)',
+    'rgba(54, 162, 235, 0.2)',
+    'rgba(255, 206, 86, 0.2)',
+    'rgba(75, 192, 192, 0.2)',
+    'rgba(153, 102, 255, 0.2)',
+    'rgba(255, 159, 64, 0.2)']
+    , 'borderColor': [
+              'rgba(255,99,132,1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 206, 86, 1)',
+              'rgba(75, 192, 192, 1)',
+              'rgba(153, 102, 255, 1)',
+              'rgba(255, 159, 64, 1)'
+    ] }
+
+    public type: 'line';
+    public data = [12, 19, 3, 5, 2, 3];//{
+    //     labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+    //     datasets: [{
+    //         label: '# of Votes',
+    //         data: [12, 19, 3, 5, 2, 3],
+    //         backgroundColor: [
+    //             'rgba(255, 99, 132, 0.2)',
+    //             'rgba(54, 162, 235, 0.2)',
+    //             'rgba(255, 206, 86, 0.2)',
+    //             'rgba(75, 192, 192, 0.2)',
+    //             'rgba(153, 102, 255, 0.2)',
+    //             'rgba(255, 159, 64, 0.2)'
+    //         ],
+    //         borderColor: [
+    //             'rgba(255,99,132,1)',
+    //             'rgba(54, 162, 235, 1)',
+    //             'rgba(255, 206, 86, 1)',
+    //             'rgba(75, 192, 192, 1)',
+    //             'rgba(153, 102, 255, 1)',
+    //             'rgba(255, 159, 64, 1)'
+    //         ],
+    //         borderWidth: 1
+    //     }]
+    // };
+    public options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+
+  // events on slice click
+  public chartClicked(e:any):void {
+    console.log(e);
+  }
+
+ // event on pie chart slice hover
+  public chartHovered(e:any):void {
+    console.log(e);
+  }
   ngOnInit(){
    this.LineChart = new Chart('myChart',{
-     type: 'pie',
+     type: 'bar',
      data:{
       labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
       datasets: [{
