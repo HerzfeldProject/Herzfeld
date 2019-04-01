@@ -1,0 +1,7 @@
+{   "/api": {
+  "target": "http://tempuri.org/IQueryDrivenAPI",
+  "secure": false,
+  "logLevel": "debug",
+  "changeOrigin": true
+}
+}

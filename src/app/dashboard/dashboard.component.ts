@@ -37,8 +37,8 @@ export class DashboardComponent implements OnInit {
 
   }
   title = 'app';
-  public pieChartLabels:string[] = ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"];
-  public pieChartData:number[] =  [12, 19, 3, 5, 2, 3];
+  public pieChartLabels:string[] = ['pain', 'norton', 'skin', 'diagnostic', 'albumin', 'nutrition', 'Not Executed'];
+  public pieChartData:number[] =  [10, 20, 35, 5, 5, 10, 15];
   public pieChartType:string = 'pie';
   public pieChartOptions:any = {'backgroundColor': [
     'rgba(255, 99, 132, 0.2)',
@@ -57,7 +57,6 @@ export class DashboardComponent implements OnInit {
     ] }
 
     public barChartOptions = {
-      scaleShowVerticalLines: false,
       responsive: true,
       borderColor: [
         'rgba(255,99,132,1)',
@@ -72,14 +71,27 @@ export class DashboardComponent implements OnInit {
           'rgba(255, 206, 86, 0.2)',
           'rgba(75, 192, 192, 0.2)',
           'rgba(153, 102, 255, 0.2)',
-          'rgba(255, 159, 64, 0.2)']
+          'rgba(255, 159, 64, 0.2)'],
+      scaleShowVerticalLines: false,
+      scales: {
+        yAxes: [{
+          ticks: {
+            beginAtZero: true
+          }
+        }]
+      },
     };
-    public barChartLabels = ['2006', '2007', '2008', '2009', '2010', '2011', '2012'];
+    public barChartLabels = ['pain', 'norton', 'skin', 'diagnostic', 'albumin', 'nutrition'];
     public barChartType = 'bar';
     public barChartLegend = true;
     public barChartData = [
-      {data: [65, 59, 80, 81, 56, 55, 40], label: 'Series A'},
-      {data: [28, 48, 40, 19, 86, 27, 90], label: 'Series B'}
+      {data: [65, 59, 80, 81, 56, 55], label: 'Completion percentages'},
+      // {data: [28, 48, 40, 19, 86, 27], label: 'order'},
+      // {data: [28, 38, 45, 14, 80, 15], label: 'period'},
+      // {data: [28, 38, 45, 14, 80, 15], label: 'binary'},
+      // {data: [28, 38, 45, 14, 80, 15], label: 'more'}
+
+
     ];
   // events on slice click
   public chartClicked(e:any):void {

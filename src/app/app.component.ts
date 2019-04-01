@@ -11,10 +11,11 @@ export class AppComponent implements OnInit {
   private fromDate: Date;
   private toDate: Date;
   optionsModel: number[];
-    myOptions: IMultiSelectOption[];
+  myOptions: IMultiSelectOption[];
+  myOptions1: IMultiSelectOption[];
 
       // Multi Select Settings configuration
-      private multiSelectSettings: IMultiSelectSettings = {
+      public multiSelectSettings: IMultiSelectSettings = {
         enableSearch: true,
         showCheckAll: true,
         showUncheckAll: true
@@ -29,6 +30,13 @@ export class AppComponent implements OnInit {
             { id: 6, name: '311674564' },
 
         ];
+
+      this.myOptions1 = [
+        { id: 1, name: '1' },
+        { id: 2, name: '2' },
+        { id: 3, name: '3' },
+
+      ];
     }
     onChange() {
         console.log(this.optionsModel);
@@ -41,6 +49,9 @@ export class AppComponent implements OnInit {
       //     this.dtCorrectionsRequired.to = false;
       // }
       // this.validateInput();
+  }
+  private Submit() {
+      // create a request for data base data or patient base
   }
 
 }

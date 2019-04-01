@@ -31,9 +31,10 @@ export class FollowUpDashboardComponent {
 
   constructor(private breakpointObserver: BreakpointObserver) {}
 
-  public pieChartLabels:string[] = ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"];
-  public pieChartData:number[] =  [12, 19, 3, 5, 2, 3];
-  public pieChartType:string = 'pie';
+  public expand = false;
+  public pieChartLabels:string[] = ['True','False'];
+  public pieChartData:number[] =  [0.8, 0.2];
+  public pieChartType:string = 'doughnut';
   public pieChartOptions:any = {'backgroundColor': [
     'rgba(255, 99, 132, 0.2)',
     'rgba(54, 162, 235, 0.2)',
@@ -48,10 +49,25 @@ export class FollowUpDashboardComponent {
               'rgba(75, 192, 192, 1)',
               'rgba(153, 102, 255, 1)',
               'rgba(255, 159, 64, 1)'
-    ] }
+    ], 'elements': {
+      'center' : {
+        'text': '90%',
+        'color': '#FF6384', // Default is #000000
+        'fontStyle': 'Arial', // Default is Arial
+        'sidePadding': 20 // Defualt is 20 (as a percentage)
+      }
+    } };
 
     public barChartOptions = {
       scaleShowVerticalLines: false,
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
+        },
+
       responsive: true,
       borderColor: [
         'rgba(255,99,132,1)',
@@ -68,12 +84,15 @@ export class FollowUpDashboardComponent {
           'rgba(153, 102, 255, 0.2)',
           'rgba(255, 159, 64, 0.2)']
     };
-    public barChartLabels = ['2006', '2007', '2008', '2009', '2010', '2011', '2012'];
+    public barChartLabels = ['skin','norton','pain'];
     public barChartType = 'bar';
     public barChartLegend = true;
     public barChartData = [
-      {data: [65, 59, 80, 81, 56, 55, 40], label: 'Series A'},
-      {data: [28, 48, 40, 19, 86, 27, 90], label: 'Series B'}
+      {data: [0.8, 0.8, 1], label: 'compliance'},
+      // {data: [0.2, 0.6, 0.7], label: 'order'},
+      // {data: [1, 1, 1], label: 'period'},
+      // {data: [0.1, 0.5, 0.6], label: 'binary'},
+      // {data: [0.5, 0.7, 1], label: 'more'}
     ];
   // events on slice click
   public chartClicked(e:any):void {
@@ -84,7 +103,11 @@ export class FollowUpDashboardComponent {
   public chartHovered(e:any):void {
     console.log(e);
   }
-  ngOnInit(){
-
+  public expandData(){
+    console.log("erre")
+    this.expand = true;
   }
+  ngOnInit(){
+  }
+
 }

@@ -2,13 +2,20 @@ import { NgModule} from '@angular/core';
 import {Route, RouterModule} from '@angular/router';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { FollowUpDashboardComponent } from './follow-up-dashboard/follow-up-dashboard.component';
+import { PreventionDashboardComponent } from './prevention-dashboard/prevention-dashboard.component';
+import { TreatmentDashboardComponent } from './treatment-dashboard/treatment-dashboard.component';
+import { SummaryDashboardComponent } from './summary-dashboard/summary-dashboard.component';
+import {LoginComponent} from './authentication/login/login.component';
 
 const routes: Route[] = [
-  {path: '', pathMatch: 'full', redirectTo: 'admission'},
-  {path: 'admission', component: DashboardComponent},
-  {path: 'followup' , component: FollowUpDashboardComponent},
-  {path: 'prevention', component: DashboardComponent},
-  {path: 'treatment', component: DashboardComponent},
+  {path: '', pathMatch: 'full', redirectTo: 'login'},
+  {path: 'login', component: LoginComponent}
+  // {path: 'admission', component: DashboardComponent},
+  // {path: 'followup' , component: FollowUpDashboardComponent},
+  // {path: 'prevention', component: PreventionDashboardComponent},
+  // {path: 'treatment', component: TreatmentDashboardComponent},
+  // {path: 'summary', component: SummaryDashboardComponent},
+
 ];
 
 @NgModule({

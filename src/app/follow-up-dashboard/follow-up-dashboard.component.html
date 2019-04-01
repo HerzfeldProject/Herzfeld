@@ -1,6 +1,6 @@
 <div class="grid-container">
     <h1 class="mat-h1" style="text-align: center">Follow up</h1>
-    <mat-grid-list cols="2" rowHeight="3:2">
+    <mat-grid-list cols="2">
         <mat-grid-tile>
             <mat-card class="dashboard-card">
                 <mat-card-header>
@@ -10,14 +10,15 @@
               <mat-icon>more_vert</mat-icon>
             </button>
                         <mat-menu #menu="matMenu" xPosition="before">
-                            <button mat-menu-item>Expand</button>
-                            <button mat-menu-item>Remove</button>
+                            <button mat-menu-item (click)="expandData()">Expand</button>
                         </mat-menu>
                     </mat-card-title>
                 </mat-card-header>
                 <mat-card-content class="dashboard-card-content">
                     <div style="display: block"> <canvas baseChart [datasets]="barChartData" [labels]="barChartLabels" [options]="barChartOptions" [legend]="barChartLegend" [chartType]="barChartType">
-                      </canvas></div>
+                      </canvas>
+                        <followup-table [hidden]="!expand"></followup-table>
+                    </div>
                 </mat-card-content>
             </mat-card>
         </mat-grid-tile>
@@ -25,11 +26,11 @@
             <mat-card class="dashboard-card">
                 <mat-card-header>
                     <mat-card-title>
-                        Follow up process
+                        Follow up process compliance
                     </mat-card-title>
                 </mat-card-header>
                 <mat-card-content class="dashboard-card-content">
-                    <div><canvas baseChart [data]="pieChartData" [labels]="pieChartLabels" [chartType]="pieChartType" [options]="pieChartOptions" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas></div>
+                    <div><canvas baseChart id="pieChart" [data]="pieChartData" [labels]="pieChartLabels" [chartType]="pieChartType" [options]="pieChartOptions" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas></div>
                 </mat-card-content>
             </mat-card>
         </mat-grid-tile>
