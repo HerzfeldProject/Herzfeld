@@ -1,0 +1,8 @@
+{
+  "/IQueryDrivenAPI": {
+  "target": "http://medinfo2.ise.bgu.ac.il/MediatorNewTAK/DataDrivenAPI/DataDrivenAPI.svc?wdsl",
+  "secure": false,
+  "logLevel": "debug",
+  "changeOrigin": true
+}
+}

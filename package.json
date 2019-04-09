@@ -3,7 +3,7 @@
     "version": "0.0.0",
     "scripts": {
         "ng": "ng",
-        "start": "ng serve",
+        "start": "ng serve --proxy-config proxy.conf.json",
         "build": "ng build",
         "test": "ng test",
         "lint": "ng lint",
@@ -24,12 +24,13 @@
         "@angular/platform-browser-dynamic": "^6.1.0",
         "@angular/router": "^6.1.0",
         "angular-2-dropdown-multiselect": "^1.3.2",
+        "angular-google-charts": "^0.1.3",
         "bootstrap": "^3.3.7",
         "buffer": "^5.2.1",
         "chart.js": "^2.7.3",
         "chartjs": "^0.3.24",
         "concat-stream": "^2.0.0",
-        "core-js": "^2.6.5",
+        "core-js": "^3.0.0",
         "crypto-js": "^3.1.9-1",
         "events": "^3.0.0",
         "firebase": "^5.9.0",
@@ -43,6 +44,8 @@
         "stream": "0.0.2",
         "strong-soap": "^1.18.0",
         "uuid": "^3.3.2",
+        "wcf.js": "0.0.6",
+        "ws.js": "^2.0.23",
         "zone.js": "~0.8.26"
     },
     "devDependencies": {
