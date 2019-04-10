@@ -28,40 +28,41 @@ export class StartComponent implements OnInit {
   client: Client;
   constructor(private valService: ValuesService, private _http: HttpClient, private soap: NgxSoapService) {
 
-    // const headers = new HttpHeaders({'Content-Type': 'text/xml'}); // , 'SOAPAction': 'http://tempuri.org/IQueryDrivenAPI/GetAllRawData'});
-    // this._http.get('http://132.72.65.196/MediatorNewTAK/DataDrivenAPI/DataDrivenAPI.svc?wsdl',
-    //   { headers: headers, responseType: 'text'})
-    //   .subscribe(data => console.log(data),
-    //     error => console.log(error));
+    const headers = new HttpHeaders({}); // 'Content-Type': 'text/xml'}); // , 'SOAPAction': 'http://tempuri.org/IQueryDrivenAPI/GetAllRawData'});
+    this._http.get('https://medinfo2.ise.bgu.ac.il/chronicpaintest/wcf/service1.svc/jsonp/activatepatient',
+      {observe: 'body', params: {'patientInitCode': '5345'}})
+      .subscribe(data => console.log(data),
+        error => console.log(error));
 
 
-    const xmlreq = new XMLHttpRequest();
-    const message = '<xml version="1.0" encoding="utf-8">\n' +
-      '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">\n' +
-      '<s:Header />\n' +
-      '<s:Body>\n' +
-      '<GetAllRawData xmlns="http://tempuri.org/">\n' +
-      '<projectId>9</projectId>\n' +
-      '<entityId>15</entityId>\n' +
-      '</GetAllRawData>\n' +
-      '</s:Body>\n' +
-      '</s:Envelope>';
-    xmlreq.open('GET', 'http://132.72.65.196/MediatorNewTAK/DataDrivenAPI/DataDrivenAPI.svc?wsdl', true);
-    // xmlreq.setRequestHeader('Access-Control-Allow-Origin','*');
-     xmlreq.setRequestHeader('Content-Type', 'text/xml');
-    // xmlreq.setRequestHeader('SOAPAction', 'http://tempuri.org/IQueryDrivenAPI/GetAllRawData');
-    xmlreq.onreadystatechange = function () {
-      if (xmlreq.readyState === 4) {
-        if (xmlreq.status === 200) {
-          console.log(xmlreq.response);
-        }
-      }
-    };
-    xmlreq.withCredentials = true;
-    // xmlreq.setRequestHeader('SOAPAction', 'http://tempuri.org/IQueryDrivenAPI/GetAllRawData');
-    // xmlreq.setRequestHeader('Content-Type', 'text/xml;charset=utf-8');
-    xmlreq.responseType = 'document';
-    xmlreq.send(message);
+    // const xmlreq = new XMLHttpRequest();
+    // const message = '<xml version="1.0" encoding="utf-8">\n' +
+    //   '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">\n' +
+    //   '<s:Header />\n' +
+    //   '<s:Body>\n' +
+    //   '<GetAllRawData xmlns="http://tempuri.org/">\n' +
+    //   '<projectId>9</projectId>\n' +
+    //   '<entityId>15</entityId>\n' +
+    //   '</GetAllRawData>\n' +
+    //   '</s:Body>\n' +
+    //   '</s:Envelope>';
+    // // xmlreq.open('GET', 'http://132.72.65.196/MediatorNewTAK/DataDrivenAPI/DataDrivenAPI.svc?wsdl', true);
+    //
+    // // xmlreq.setRequestHeader('Access-Control-Allow-Origin','*');
+    //  xmlreq.setRequestHeader('Content-Type', 'text/xml');
+    // // xmlreq.setRequestHeader('SOAPAction', 'http://tempuri.org/IQueryDrivenAPI/GetAllRawData');
+    // xmlreq.onreadystatechange = function () {
+    //   if (xmlreq.readyState === 4) {
+    //     if (xmlreq.status === 200) {
+    //       console.log(xmlreq.response);
+    //     }
+    //   }
+    // };
+    // xmlreq.withCredentials = true;
+    // // xmlreq.setRequestHeader('SOAPAction', 'http://tempuri.org/IQueryDrivenAPI/GetAllRawData');
+    // // xmlreq.setRequestHeader('Content-Type', 'text/xml;charset=utf-8');
+    // xmlreq.responseType = 'document';
+    // xmlreq.send(message);
   }
   ngOnInit() {
     // const patients = this.valService.getPatients();
