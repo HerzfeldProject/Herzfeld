@@ -12,7 +12,7 @@ import {Weights} from '../models/weights';
 })
 export class AdmissionDashboardComponent implements OnInit, AfterViewInit {
 
-  weights = Weights;
+weights = Weights;
 title = 'app';
 public showIntervals = false;
 public colorsCompliance = [ {backgroundColor: ['#019000', '#a41904']}];
@@ -100,7 +100,7 @@ ngOnInit() {
       chart.draw(dataTable);
     }
     const titleOfIntervales = document.createElement('h5');
-    titleOfIntervales.textContent = " ";
+    titleOfIntervales.textContent = '  ';
     titleOfIntervales.textContent = conceptName + ' complition';
     document.getElementById('intervalsPatients').appendChild(titleOfIntervales);
     document.getElementById('intervalesDashboard').focus();
