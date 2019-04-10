@@ -17,7 +17,7 @@ title = 'app';
 public showIntervals = false;
 public colorsCompliance = [ {backgroundColor: ['#019000', '#a41904']}];
 // public colorsConcepts = [ {backgroundColor: ['#5ab1b4', '#67a56b', '#5ab1b4', '#67a56b', '#5ab1b4', '#67a56b', '#5ab1b4', '#67a56b']}];
-public colorsConcepts = [ {backgroundColor: ['#14143e', '#951630', '#cf3800', '#b69200', '#008e62', '#057695', '#841386', '#fff']}];
+public colorsConcepts = [ {backgroundColor: ['#14143e', '#951630', '#cf3800', '#019000', '#008e62', '#057695', '#841386', '#fff']}];
 
 admissionCompliance: PieChartData;
 admissionConcepts: BarChartData;
@@ -64,23 +64,23 @@ ngOnInit() {
 
   const conceptName = i[0]._model.label;
 
-  // const tile = document.createElement('mat-grid-tile');
-  // tile.setAttribute('rowHeight', 'fit');
-  // const card = document.createElement('mat-card');
-  // card.setAttribute('class', 'dashboard-card');
-  // const head = document.createElement('mat-card-header');
-  // const title = document.createElement('mat-card-title');
-  // const div = document.createElement('div');
-  // div.setAttribute('id', 'intervalsPatients')
-  // const content = document.createElement('mat-card-content');
-  // const div2 = document.createElement('div');
-  // div2.setAttribute('id', 'timelinediv');
-  // div2.setAttribute('style', 'display: block;width: 100%');
-  // document.getElementById('intervalesDashboard').appendChild(tile.appendChild(
-  //   card.appendChild(head.appendChild(title.appendChild(div))).appendChild(content.appendChild(div2))));
+  const tile = document.createElement('mat-grid-tile');
+  tile.setAttribute('rowHeight', 'fit');
+  const card = document.createElement('mat-card');
+  card.setAttribute('class', 'dashboard-card');
+  const head = document.createElement('mat-card-header');
+  const title = document.createElement('mat-card-title');
+  const div = document.createElement('div');
+  div.setAttribute('id', 'intervalsPatients')
+  const content = document.createElement('mat-card-content');
+  const div2 = document.createElement('div');
+  div2.setAttribute('id', 'timelinediv');
+  div2.setAttribute('style', 'display: block;width: 100%');
+  document.getElementById('intervalesDashboard').appendChild(tile.appendChild(
+    card.appendChild(head.appendChild(title.appendChild(div))).appendChild(content.appendChild(div2))));
 
 
-// calculateIntervalesForAllPatients
+  // calculateIntervalesForAllPatients
     google.charts.load('current', { 'packages': ['corechart', 'timeline']});
     google.charts.setOnLoadCallback(drawTimeLine);
 
@@ -101,9 +101,9 @@ ngOnInit() {
     }
     const titleOfIntervales = document.createElement('h5');
     titleOfIntervales.textContent = '  ';
-    titleOfIntervales.textContent = conceptName + ' complition';
+    titleOfIntervales.textContent = conceptName + ' compliance of all Patients';
     document.getElementById('intervalsPatients').appendChild(titleOfIntervales);
-    document.getElementById('intervalesDashboard').focus();
+     document.getElementById('intervalesDashboard').focus();
 }
 onPatientClick(patientname, conceptname) {
 
