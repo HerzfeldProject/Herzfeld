@@ -15,7 +15,7 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit {
   weights = Weights;
 title = 'app';
 public showIntervals = false;
-public colorsCompliance = [ {backgroundColor: ['#01fa00', '#ff2604']}];
+public colorsCompliance = [ {backgroundColor: ['#019000', '#a41904']}];
 // public colorsConcepts = [ {backgroundColor: ['#5ab1b4', '#67a56b', '#5ab1b4', '#67a56b', '#5ab1b4', '#67a56b', '#5ab1b4', '#67a56b']}];
 public colorsConcepts = [ {backgroundColor: ['#14143e', '#951630', '#cf3800', '#b69200', '#008e62', '#057695', '#841386', '#fff']}];
 
