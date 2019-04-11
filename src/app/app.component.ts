@@ -7,6 +7,7 @@ import { IMultiSelectSettings, IMultiSelectTexts, IMultiSelectOption } from 'ang
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+  // public serched = true;
   title = 'Herzfeld';
   private fromDate: Date;
   private toDate: Date;

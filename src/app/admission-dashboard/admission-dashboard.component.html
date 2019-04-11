@@ -5,23 +5,20 @@
         <mat-card class="dashboard-card">
           <mat-card-header>
             <mat-card-title>
-              <h5>Admission process compliance percentages.<br><br>
-                Based on all tests in the Admission process.
+              <h5 style="font-size: 20px; color: #0071c5">Total Compliance Score:<br><br>
               </h5>
             </mat-card-title>
           </mat-card-header>
           <mat-card-content class="col-lg-12 col-md-12">
-<!--            <div class="col-lg-2 col-md-2"><h5>-->
-<!--              Concepts: <br><br>-->
-<!--              Pain - {{weights.ADMISSION_PAIN_WEIGHT_IN_STAGE}} % <br><br>-->
-<!--              Norton - {{weights.ADMISSION_NOTRON_WEIGHT_IN_STAGE}} % <br><br>-->
-<!--              Skin - {{weights.ADMISSION_SKIN_WEIGHT_IN_STAGE}} % <br><br>-->
-<!--              Diagnos - {{weights.ADMISSION_DIAGNOSIS_WEIGHT_IN_STAGE}} % <br><br>-->
-<!--              Albumin - {{weights.ADMISSION_ALBUMIN_WEIGHT_IN_STAGE}} % <br><br>-->
-<!--              Nurtition Diatition - {{weights.ADMISSION_DIETITION_NUTRITION_WEIGHT_IN_STAGE}} % <br><br>-->
-<!--              Nutrition Nurse - {{weights.ADMISSION_NURSE_NUTRITION_WEIGHT_IN_STAGE}} %-->
-<!--            </h5></div>-->
-            <div class="col-lg-12 col-md-12">
+            <div class="col-lg-3 col-md-3"><h5>
+              Weight Distribution: <br><br>
+              Pain- {{weights.ADMISSION_PAIN_WEIGHT_IN_STAGE}}% <br><br>
+              Norton- {{weights.ADMISSION_NOTRON_WEIGHT_IN_STAGE}}% <br><br>
+              Skin- {{weights.ADMISSION_SKIN_WEIGHT_IN_STAGE}}% <br><br>
+              Albumin- {{weights.ADMISSION_ALBUMIN_WEIGHT_IN_STAGE}}% <br><br>
+              Nutrition- {{weights.ADMISSION_DIETITION_NUTRITION_WEIGHT_IN_STAGE+ weights.ADMISSION_NURSE_NUTRITION_WEIGHT_IN_STAGE}}% <br><br>
+            </h5></div>
+            <div class="col-lg-9 col-md-9">
               <canvas #mychart baseChart [data]="admissionCompliance.finalValue" [labels]="['True','False']" [chartType]="'doughnut'" [options]="admissionCompliance.options" [colors]="colorsCompliance" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
             </div>
           </mat-card-content>
@@ -31,7 +28,7 @@
             <mat-card class="dashboard-card">
                 <mat-card-header>
                     <mat-card-title>
-                      <h5>                        Tests in Admission process.
+                      <h5 style="font-size: 20px; color: #0071c5">Detailed Admission Scores:
                       </h5>
                     </mat-card-title>
                 </mat-card-header>
@@ -43,18 +40,42 @@
         </mat-grid-tile>
     </mat-grid-list>
   <mat-grid-list id="intervalesDashboard" class="col col-lg-12 col-md-12" cols="1" >
-<!--    <mat-grid-tile  rowHeight="fit">-->
-<!--      <mat-card class="dashboard-card">-->
-<!--        <mat-card-header>-->
-<!--          <mat-card-title>-->
-<!--            <div id="intervalsPatients"></div>-->
-<!--          </mat-card-title>-->
-<!--        </mat-card-header>-->
-<!--        <mat-card-content >-->
-<!--          <div id="timelinediv" style="display: block;width: 100%"></div>-->
-<!--        </mat-card-content>-->
-<!--      </mat-card>-->
-<!--    </mat-grid-tile>-->
+    <mat-grid-tile  rowHeight="fit">
+      <mat-card class="dashboard-card">
+        <mat-card-header>
+          <mat-card-title>
+            <div id="intervalsPatients"></div>
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content >
+          <div id="timelinediv" style="display: block;width: 100%"></div>
+          <div id="description">
+<!--            <mat-form-field *ngIf="checked">-->
+<!--              <mat-select style="margin-top: 22px; " placeholder="Choose Patient:">-->
+<!--                <mat-option (click)="onPatientClick('311673313', 'Pain')" value="311673313">311673313</mat-option>-->
+<!--                <mat-option value="325846795">325846795</mat-option>-->
+<!--                <mat-option value="201125689">201125689</mat-option>-->
+<!--              </mat-select>-->
+<!--            </mat-form-field>-->
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+  </mat-grid-list>
+  <mat-grid-list id="intervalesPatient" class="col col-lg-12 col-md-12" cols="1" >
+    <mat-grid-tile  rowHeight="fit">
+      <mat-card class="dashboard-card">
+        <mat-card-header>
+          <mat-card-title>
+            <div id="intervalsPatient"></div>
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content >
+          <div id="timelinediv2" style="display: block;width: 100%"></div>
+          <div id="description2"></div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
   </mat-grid-list>
 
 </div>

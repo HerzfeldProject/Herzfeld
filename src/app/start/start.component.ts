@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {ValuesService} from '../services/values.service';
 import {from, Observable} from 'rxjs';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
@@ -14,6 +14,7 @@ import {IMultiSelectOption, IMultiSelectSettings} from 'angular-2-dropdown-multi
 })
 export class StartComponent implements OnInit {
 
+  public serched = true;
   private fromDate: Date;
   private toDate: Date;
   optionsModel: number[];
@@ -28,15 +29,15 @@ export class StartComponent implements OnInit {
   client: Client;
   constructor(private valService: ValuesService, private _http: HttpClient, private soap: NgxSoapService) {
 
-    const headers = new HttpHeaders({}); // 'Content-Type': 'text/xml'}); // , 'SOAPAction': 'http://tempuri.org/IQueryDrivenAPI/GetAllRawData'});
-    this._http.get('https://medinfo2.ise.bgu.ac.il/chronicpaintest/wcf/service1.svc/jsonp/activatepatient',
-      {observe: 'body', params: {'patientInitCode': '5345'}})
-      .subscribe(data => console.log(data),
-        error => console.log(error));
+    // const headers = new HttpHeaders({'Content-Type': 'application/json'}); // , 'SOAPAction': 'http://tempuri.org/IQueryDrivenAPI/GetAllRawData'});
+    // this._http.post('http://medinfo2.ise.bgu.ac.il/MediatorNewTAK/DataDrivenAPI/DataDrivenAPI.svc?wsdl',
+    //   {headers: headers})
+    //   .subscribe(data => console.log(data),
+    //     error => console.log(error));
 
 
     // const xmlreq = new XMLHttpRequest();
-    // const message = '<xml version="1.0" encoding="utf-8">\n' +
+    // const message =
     //   '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">\n' +
     //   '<s:Header />\n' +
     //   '<s:Body>\n' +
@@ -46,11 +47,16 @@ export class StartComponent implements OnInit {
     //   '</GetAllRawData>\n' +
     //   '</s:Body>\n' +
     //   '</s:Envelope>';
-    // // xmlreq.open('GET', 'http://132.72.65.196/MediatorNewTAK/DataDrivenAPI/DataDrivenAPI.svc?wsdl', true);
+    // xmlreq.open('POST', 'http://medinfo2.ise.bgu.ac.il/MediatorNewTAK/DataDrivenAPI/DataDrivenAPI.svc', true);
+    //
+    // // xmlreq.withCredentials = true;
+    //  xmlreq.setRequestHeader('SOAPAction', 'http://tempuri.org/IQueryDrivenAPI/GetAllRawData');
+    // xmlreq.setRequestHeader('Content-Type', 'text/xml;charset=utf-8');
+    // xmlreq.responseType = 'document';
     //
     // // xmlreq.setRequestHeader('Access-Control-Allow-Origin','*');
-    //  xmlreq.setRequestHeader('Content-Type', 'text/xml');
-    // // xmlreq.setRequestHeader('SOAPAction', 'http://tempuri.org/IQueryDrivenAPI/GetAllRawData');
+    // // xmlreq.setRequestHeader('Content-Type', 'text/xml');
+    //
     // xmlreq.onreadystatechange = function () {
     //   if (xmlreq.readyState === 4) {
     //     if (xmlreq.status === 200) {
@@ -58,10 +64,7 @@ export class StartComponent implements OnInit {
     //     }
     //   }
     // };
-    // xmlreq.withCredentials = true;
-    // // xmlreq.setRequestHeader('SOAPAction', 'http://tempuri.org/IQueryDrivenAPI/GetAllRawData');
-    // // xmlreq.setRequestHeader('Content-Type', 'text/xml;charset=utf-8');
-    // xmlreq.responseType = 'document';
+    //
     // xmlreq.send(message);
   }
   ngOnInit() {
@@ -84,7 +87,7 @@ export class StartComponent implements OnInit {
     ];
   }
   Submit() {
-
+    this.serched = false;
   }
 
 }
