@@ -1,11 +1,15 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {ValuesService} from '../services/values.service';
+import {BaseServiceService} from '../services/baseService.service';
 import {from, Observable} from 'rxjs';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
  import {Client, NgxSoapService} from 'ngx-soap';
 import {XmlParser} from '@angular/compiler/src/ml_parser/xml_parser';
 import {IMultiSelectOption, IMultiSelectSettings} from 'angular-2-dropdown-multiselect';
 // import {BasicHttpBinding, Proxy} from 'wcf.js';
+import { NgxXml2jsonService } from 'ngx-xml2json';
+import {timeBaseDataRequest} from '../models/timeBaseDataRequest';
+import {patientBaseDataRequest} from '../models/patientBaseDataRequest';
+// import {parser} from 'xml2json';
 
 @Component({
   selector: 'app-start',
@@ -15,9 +19,10 @@ import {IMultiSelectOption, IMultiSelectSettings} from 'angular-2-dropdown-multi
 export class StartComponent implements OnInit {
 
   public serched = true;
-  private fromDate: Date;
-  private toDate: Date;
-  optionsModel: number[];
+  fromDate: Date;
+  toDate: Date;
+  selectedBase: string;
+  optionsModel: string[];
   myOptions: IMultiSelectOption[];
   myOptions1: IMultiSelectOption[];
 
@@ -27,47 +32,17 @@ export class StartComponent implements OnInit {
     showUncheckAll: true
   };
   client: Client;
-  constructor(private valService: ValuesService, private _http: HttpClient, private soap: NgxSoapService) {
-
-    // const headers = new HttpHeaders({'Content-Type': 'application/json'}); // , 'SOAPAction': 'http://tempuri.org/IQueryDrivenAPI/GetAllRawData'});
-    // this._http.post('http://medinfo2.ise.bgu.ac.il/MediatorNewTAK/DataDrivenAPI/DataDrivenAPI.svc?wsdl',
-    //   {headers: headers})
-    //   .subscribe(data => console.log(data),
-    //     error => console.log(error));
-
-
-    // const xmlreq = new XMLHttpRequest();
-    // const message =
-    //   '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">\n' +
-    //   '<s:Header />\n' +
-    //   '<s:Body>\n' +
-    //   '<GetAllRawData xmlns="http://tempuri.org/">\n' +
-    //   '<projectId>9</projectId>\n' +
-    //   '<entityId>15</entityId>\n' +
-    //   '</GetAllRawData>\n' +
-    //   '</s:Body>\n' +
-    //   '</s:Envelope>';
-    // xmlreq.open('POST', 'http://medinfo2.ise.bgu.ac.il/MediatorNewTAK/DataDrivenAPI/DataDrivenAPI.svc', true);
-    //
-    // // xmlreq.withCredentials = true;
-    //  xmlreq.setRequestHeader('SOAPAction', 'http://tempuri.org/IQueryDrivenAPI/GetAllRawData');
-    // xmlreq.setRequestHeader('Content-Type', 'text/xml;charset=utf-8');
-    // xmlreq.responseType = 'document';
-    //
-    // // xmlreq.setRequestHeader('Access-Control-Allow-Origin','*');
-    // // xmlreq.setRequestHeader('Content-Type', 'text/xml');
-    //
-    // xmlreq.onreadystatechange = function () {
-    //   if (xmlreq.readyState === 4) {
-    //     if (xmlreq.status === 200) {
-    //       console.log(xmlreq.response);
-    //     }
-    //   }
-    // };
-    //
-    // xmlreq.send(message);
+  private dtCorrectionsRequired = {
+    from: false,
+    to: false
+  };
+  constructor(private valService: BaseServiceService, private _http: HttpClient, private basesrv: BaseServiceService) {
+    // console.log(this.basesrv.getKnowledge());
+    this.basesrv.getPatients();
   }
   ngOnInit() {
+    this.toDate = new Date();
+    this.fromDate = new Date();
     // const patients = this.valService.getPatients();
     this.myOptions = [
       { id: 1, name: '123456789' },
@@ -78,16 +53,26 @@ export class StartComponent implements OnInit {
       { id: 6, name: '311674564' },
 
     ];
-
-    this.myOptions1 = [
-      { id: 1, name: '1' },
-      { id: 2, name: '2' },
-      { id: 3, name: '3' },
-
-    ];
   }
   Submit() {
-    this.serched = false;
+    const dateto = new Date(this.fromDate.getTime() + this.fromDate.getTimezoneOffset())
+    let request = null;
+    if (this.selectedBase === '1') {
+      request = new timeBaseDataRequest();
+      request.patientsList = this.optionsModel;
+      request.startDate = this.fromDate;
+      request.endData = this.toDate;
+    } else if (this.selectedBase === '2') {
+      request = new patientBaseDataRequest();
+      request.patientsList = this.optionsModel;
+      request.startDate = this.fromDate;
+      request.endData = this.toDate;
+    }
+
+    // getCompliance
+    // const result = this.basesrv.getCompliance(request);
+    // parser.xmlToJson(result)
+     this.serched = false;
   }
 
 }

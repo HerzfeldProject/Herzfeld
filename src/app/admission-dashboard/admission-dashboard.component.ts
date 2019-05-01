@@ -71,7 +71,7 @@ ngOnInit() {
         }
       }};
 
-    // create bar chart
+  // create bar chart
   this.admissionConcepts = new BarChartData();
   this.admissionConcepts.labels = ['Pain', 'Norton', 'Skin', 'Albumin', 'Nutrition'];
   this.admissionConcepts.datasets =  [{data: [65, 59, 81, 56, 55], label: 'Completion percentages'}];
