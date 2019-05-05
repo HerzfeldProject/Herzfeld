@@ -6,6 +6,7 @@ import {BarChartData} from '../models/barChartData';
 import {Weights} from '../models/weights';
 import {BaseServiceService} from '../services/baseService.service';
 import {ActivatedRoute, Router} from '@angular/router';
+import {XmlToObjectService} from '../services/xml-to-object.service';
 
 @Component({
   // selector: 'app-followup/admission-dashboard',
@@ -21,21 +22,22 @@ title = 'app';
 public showIntervals = false;
 public colorsCompliance = [ {backgroundColor: ['#01b300', '#ed1d04']}];
 // public colorsConcepts = [ {backgroundColor: ['#5ab1b4', '#67a56b', '#5ab1b4', '#67a56b', '#5ab1b4', '#67a56b', '#5ab1b4', '#67a56b']}];
-public colorsConcepts = [ {backgroundColor: ['#51bcc2', '#51bcc2', '#51bcc2', '#51bcc2', '#51bcc2', '#51bcc2']}]; // , '#d6193f', '#ff4200', '#01e800', '#008e62', '#057695', '#841386', '#fff']}];
+public colorsConcepts = [ {backgroundColor: ['#51bcc2', '#51bcc2', '#51bcc2', '#51bcc2', '#51bcc2', '#51bcc2']}];
+// , '#d6193f', '#ff4200', '#01e800', '#008e62', '#057695', '#841386', '#fff']}];
 
 admissionCompliance: PieChartData;
 admissionConcepts: BarChartData;
 
 constructor(private admDashService: AdmissionDashboardService, private basesrv: BaseServiceService,   private route: ActivatedRoute,
-            private router: Router) {
+            private router: Router, private xmltosrv: XmlToObjectService) {
   this.route.params.subscribe(params => {
     this.mainRequest = params['mainR'];
   });
-  this.basesrv.getCompliance(this.mainRequest, data => {
-    const plan = this.basesrv.prepareXMLofCompliance(data);
-    console.log(plan);
-    // this.serched = false;
-  });
+  // this.basesrv.getCompliance(this.mainRequest, data => {
+  //   const plan = this.basesrv.prepareXMLofCompliance(data);
+  //   console.log(plan);
+  //   // this.serched = false;
+  // });
 }
 
   ngAfterViewInit() {
@@ -105,7 +107,9 @@ ngOnInit() {
   onConceptClick(c, i) {
 
   const conceptName = i[0]._model.label;
-  //
+  this.basesrv.getData(conceptName, data => {
+    const temp = this.xmltosrv.prepareXMLofDATA(data);
+  });
   // const tile = document.createElement('mat-grid-tile');
   // tile.setAttribute('rowHeight', 'fit');
   // const card = document.createElement('mat-card');

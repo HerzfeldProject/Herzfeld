@@ -48,7 +48,7 @@ export class LoginComponent implements OnInit {
     this.user1.password = this.loginForm.controls.password.value;
     this.basesrv.authenticate(this.user1, data => {
       if (data === 'true') {
-        this.router.navigate([this.returnUrl])
+        this.router.navigate([this.returnUrl]);
         this.loading = true;
       } else {
         console.log('errorrrr');
