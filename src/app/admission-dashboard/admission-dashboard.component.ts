@@ -1,9 +1,11 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import {Component, OnInit, AfterViewInit, Input, ViewChild, Output} from '@angular/core';
 import { Chart } from 'chart.js';
 import {PieChartData} from '../models/pieChartData';
 import {AdmissionDashboardService} from './admission-dashboard.service';
 import {BarChartData} from '../models/barChartData';
 import {Weights} from '../models/weights';
+import {BaseServiceService} from '../services/baseService.service';
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
   // selector: 'app-followup/admission-dashboard',
@@ -12,6 +14,7 @@ import {Weights} from '../models/weights';
 })
 export class AdmissionDashboardComponent implements OnInit, AfterViewInit {
 
+@Input() mainRequest;
 public checked = false;
 weights = Weights;
 title = 'app';
@@ -23,7 +26,17 @@ public colorsConcepts = [ {backgroundColor: ['#51bcc2', '#51bcc2', '#51bcc2', '#
 admissionCompliance: PieChartData;
 admissionConcepts: BarChartData;
 
-constructor(private admDashService: AdmissionDashboardService) {}
+constructor(private admDashService: AdmissionDashboardService, private basesrv: BaseServiceService,   private route: ActivatedRoute,
+            private router: Router) {
+  this.route.params.subscribe(params => {
+    this.mainRequest = params['mainR'];
+  });
+  this.basesrv.getCompliance(this.mainRequest, data => {
+    const plan = this.basesrv.prepareXMLofCompliance(data);
+    console.log(plan);
+    // this.serched = false;
+  });
+}
 
   ngAfterViewInit() {
     Chart.pluginService.register({
@@ -52,6 +65,7 @@ constructor(private admDashService: AdmissionDashboardService) {}
     });
   }
 ngOnInit() {
+
 
   this.checked = false;
     // document.getElementById('intervalesDashboard').setAttribute('*ngIf', 'true');

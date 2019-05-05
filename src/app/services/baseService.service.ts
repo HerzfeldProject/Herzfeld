@@ -3,6 +3,7 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 // import {BasicHttpBinding, Proxy} from 'wcf.js';
 import {from} from 'rxjs';
 import {DataInstance} from '../models/dataInstance';
+import {Plan} from '../models/plan';
 // import {Observable} from 'rxjs';
 // import * as $ from 'jquery';
 
@@ -14,24 +15,24 @@ export class BaseServiceService implements OnInit {
 
   public proxy;
   public message;
-  public
   constructor( private _http: HttpClient) { }
 
-  ngOnInit() { }
+  ngOnInit() {
+  }
 
-  public getCompliance(request)  {
+  public getCompliance(request, callback)  {
     const xmlreq = new XMLHttpRequest();
     xmlreq.open('POST', 'http://medinfo2.ise.bgu.ac.il/MediatorNewTAK/complianceAPI/complianceAPI.svc', true);
     xmlreq.setRequestHeader('Content-Type', 'text/xml;charset=utf-8');
     xmlreq.responseType = 'document';
-    const message = '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">\n' +
+    const message2 = '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">\n' +
       '<s:Body>' +
       '<GetCompliance xmlns="http://tempuri.org/">' +
-      '<state>followUp</state>' +
-      '<patientsId>2</patientsId>' +
-      '<start>2016-04-20T17:06:00</start>' +
-      '<end>2019-04-20T17:06:00</end>' +
-      '<typeFlag>1</typeFlag>' +
+      '<state>' + request.stage + '</state>' +
+      '<patientsId>' + request.patientsList.toString() + '</patientsId>' +
+      '<start>' + request.startDate.toISOString().substring(0, request.startDate.toISOString().indexOf('.')) + '</start>' +
+      '<end>' + request.endDate.toISOString().substring(0, request.startDate.toISOString().indexOf('.')) + '</end>' +
+      '<typeFlag>' + request.type + '</typeFlag>' +
       '<projectId>27</projectId>' +
       '</GetCompliance>' +
       '</s:Body>' +
@@ -40,13 +41,17 @@ export class BaseServiceService implements OnInit {
     xmlreq.onreadystatechange = function () {
       if (xmlreq.readyState === 4) {
         if (xmlreq.status === 200) {
-           return xmlreq.responseXML;
+          const parser = new DOMParser();
+          console.log(xmlreq.responseXML);
+          const result = parser.parseFromString(xmlreq.responseXML.getElementsByTagName
+          ('GetComplianceResult')[0].childNodes[0].textContent, 'text/xml');
+          callback.apply(this, [result]);
         }
       }
     };
-    xmlreq.send(message);
+    xmlreq.send(message2);
   }
-  public getSubPlanes()  {
+  public getSubPlanes(callback)  {
     const xmlreq = new XMLHttpRequest();
     xmlreq.open('POST', 'http://medinfo2.ise.bgu.ac.il/MediatorNewTAK/complianceAPI/complianceAPI.svc', true);
     xmlreq.setRequestHeader('Content-Type', 'text/xml;charset=utf-8');
@@ -62,13 +67,15 @@ export class BaseServiceService implements OnInit {
     xmlreq.onreadystatechange = function () {
       if (xmlreq.readyState === 4) {
         if (xmlreq.status === 200) {
-          console.log(xmlreq.responseXML);
+          const result = xmlreq.responseXML.getElementsByTagName
+          ('GetSubPlansResult')[0].childNodes;
+          callback.apply(this, [result]);
         }
       }
     };
     xmlreq.send(message);
   }
-  public getPatients() {
+  public getPatients(callback) {
   const xmlreq = new XMLHttpRequest();
   xmlreq.open('POST', 'http://medinfo2.ise.bgu.ac.il/MediatorNewTAK/AdministrationAPI/AdministrationAPI.svc', true);
   xmlreq.setRequestHeader('Content-Type', 'text/xml;charset=utf-8');
@@ -84,13 +91,16 @@ export class BaseServiceService implements OnInit {
   xmlreq.onreadystatechange = function () {
     if (xmlreq.readyState === 4) {
       if (xmlreq.status === 200) {
-        console.log(xmlreq.response);
+        const result = xmlreq.responseXML.getElementsByTagName
+        ('GetPatientsResult')[0].childNodes;
+        console.log(result);
+        callback.apply(this, [result]);
       }
     }
   };
   xmlreq.send(message);
 }
-  public getKnowledge() {
+  public getKnowledge(callback) {
     let result: XMLDocument;
     const xmlreq = new XMLHttpRequest();
     xmlreq.open('POST', 'http://medinfo2.ise.bgu.ac.il/MediatorNewTAK/complianceAPI/complianceAPI.svc', true);
@@ -111,6 +121,7 @@ export class BaseServiceService implements OnInit {
           const parser = new DOMParser();
           result = parser.parseFromString(xmlreq.responseXML.getElementsByTagName
           ('GetKnowledgeResult')[0].childNodes[0].textContent, 'text/xml');
+          callback.apply(this, [result]);
         }
       }
     };
@@ -119,7 +130,7 @@ export class BaseServiceService implements OnInit {
       return result;
     }
   }
-  public getData(request) {
+  public getData(request, callback) {
     const xmlreq = new XMLHttpRequest();
     xmlreq.open('POST', 'http://medinfo2.ise.bgu.ac.il/MediatorNewTAK/queryDrivenAPI/queryDrivenAPI.svc', true);
     xmlreq.setRequestHeader('Content-Type', 'text/xml;charset=utf-8');
@@ -129,8 +140,8 @@ export class BaseServiceService implements OnInit {
       '<s:Body>' +
       '<GetData xmlns="http://tempuri.org/">' +
       '<projectId>27</projectId>' +
-      '<patientIds>1</patientIds>' +
-      '<conceptId>10870</conceptId>' +
+      '<patientIds>3</patientIds>' +
+      '<conceptId>11031</conceptId>' +
       '<necessaryContexts/>' +
       '<exclusionContexts />' +
       '<contextFlag>9</contextFlag>' +
@@ -141,13 +152,13 @@ export class BaseServiceService implements OnInit {
     xmlreq.onreadystatechange = function () {
       if (xmlreq.readyState === 4) {
         if (xmlreq.status === 200) {
-          return xmlreq.responseXML;
+          callback.apply(this, [xmlreq.responseXML.getElementsByTagName('GetDataResult')[0].childNodes]);
         }
       }
     };
     xmlreq.send(message);
   }
-  public authenticate(user) {
+  public authenticate(user, callback) {
     const xmlreq = new XMLHttpRequest();
     xmlreq.open('POST', 'http://medinfo2.ise.bgu.ac.il/MediatorNewTAK/AdministrationAPI/AdministrationAPI.svc', true);
     xmlreq.setRequestHeader('Content-Type', 'text/xml;charset=utf-8');
@@ -157,8 +168,8 @@ export class BaseServiceService implements OnInit {
       '<s:Body>' +
       '<Authenticate xmlns="http://tempuri.org/">' +
       '<projectId>27</projectId>' +
-      '<userName>erez</userName>' +
-      '<password>1234</password>' +
+      '<userName>' + user.username + '</userName>' +
+      '<password>' + user.password + '</password>' +
       '</Authenticate>' +
       '</s:Body>' +
       '</s:Envelope>';
@@ -166,12 +177,60 @@ export class BaseServiceService implements OnInit {
     xmlreq.onreadystatechange = function () {
       if (xmlreq.readyState === 4) {
         if (xmlreq.status === 200) {
-          console.log(xmlreq.responseXML);
+          const result = xmlreq.responseXML.getElementsByTagName('AuthenticateResult')[0].innerHTML;
+          callback.apply(this, [result]);
         }
       }
     };
     xmlreq.send(message);
 
+  }
+
+  prepareXMLofCompliance(data) {
+    const start = data.childNodes;
+    let plan;
+    if (start[0].nodeName.toString().toLowerCase().includes('plan')) {
+      plan = new Plan();
+      plan.name = start[0].attributes.name.nodeValue;
+      if (start[0].attributes.concept_id !== undefined) {
+        plan.conceptId = start[0].attributes.concept_id.nodeValue;
+      }
+      plan.weight = start[0].attributes.weight.nodeValue;
+      plan.score = start[0].attributes.score.nodeValue;
+      plan.subPlans = [];
+    }
+    for (let i = 0; i < start[0].children.length; i++) {
+      if ( start[0].children[i].nodeName.toString().toLowerCase().includes('plan')) {
+        plan.subPlans.push(this.createSubPlan( start[0].children[i]));
+      }
+    }
+    return plan;
+  }
+  createSubPlan(start) {
+    const plan = new Plan();
+    plan.name = start.attributes.name.nodeValue;
+    if (start.attributes.concept_id !== undefined) {
+      plan.conceptId = start.attributes.concept_id.nodeValue;
+    }
+    plan.weight = start.attributes.weight.nodeValue;
+    plan.score = start.attributes.score.nodeValue;
+    plan.subPlans = [];
+    if (start.children[0].nodeName.toString().toLowerCase().includes( 'plans')) {
+      // go over every plan and check if 'plans' or other
+      const childs = start.children[0].children;
+      for (let j = 0; j < childs.length; j++) {
+        if (childs[j].nodeName.toString().toLowerCase().includes( 'plan')) {
+          plan.subPlans.push(this.createSubPlan(childs[j]));
+        }
+      }
+    } else {
+      for (let k = 0; k < start.children.length; k++) {
+        const sub = new Plan();
+        sub.name = start.children[k].localName;
+        plan.subPlans.push(sub);
+      }
+    }
+    return plan;
   }
 
 }

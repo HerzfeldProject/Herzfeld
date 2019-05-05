@@ -4,5 +4,4 @@ export class DataInstance {
   startTime: Date;
   endTime: Date;
   value: string;
-  timeSpan: TimeRanges;
 }

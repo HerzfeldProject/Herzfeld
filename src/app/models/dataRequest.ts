@@ -1,9 +1,10 @@
-export class timeBaseDataRequest {
+export class DataRequest {
 
+  type: number;
   patientsList: string[];
   startDate: Date;
-  endData: Date;
+  endDate: Date;
   departmentsList: string[];
-  stage: stage;
+  stage: string;
 
 }

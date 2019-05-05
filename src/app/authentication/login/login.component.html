@@ -1,6 +1,10 @@
-
-    <div style="margin-top: 20px; " class="row well col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4">
+<div>
+<div *ngIf="userError" class="alert alert-danger" role="alert">
+  User {{user1.username}} {{user1.password? ' with password:'+ user1.password: ''}} don't exist!
+</div>
+<div style="margin-top: 20px; " class="row well col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4">
       <div>
+
         <h2 >Login</h2>
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
           <div class="form-group">
@@ -18,10 +22,11 @@
             </div>
           </div>
           <div class="form-group">
-            <button [disabled]="loading" class="btn btn-primary" >Login</button>
+            <button [disabled]="loading" class="btn btn-primary">Login</button>
             <img *ngIf="loading" class="pl-3" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
             <a routerLink="/register" class="btn btn-link">Register</a>
           </div>
         </form>
       </div>
     </div>
+</div>
