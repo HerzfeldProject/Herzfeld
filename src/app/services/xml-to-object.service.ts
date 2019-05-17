@@ -97,4 +97,14 @@ export class XmlToObjectService {
     }
     return dataInstances;
   }
+  createDataInstances(data, start, end) {
+    const relevantData = [];
+    for (let i = 0; i < data.length; i++) {
+      if (new Date(data[i].startTime) >= start && new Date(data[i].endTime) <= end ) {
+        relevantData.push(data[i]);
+      }
+    }
+    relevantData.sort((a, b) => {return b.value - a.value} );
+    return relevantData;
+  }
 }

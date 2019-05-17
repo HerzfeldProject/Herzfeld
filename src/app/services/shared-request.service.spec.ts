@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 
-import { AlertService } from './alert.service';
+import { SharedRequestService } from './shared-request.service';
 
-describe('AlertService', () => {
+describe('SharedRequestService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 
   it('should be created', () => {
-    const service: AlertService = TestBed.get(AlertService);
+    const service: SharedRequestService = TestBed.get(SharedRequestService);
     expect(service).toBeTruthy();
   });
 });

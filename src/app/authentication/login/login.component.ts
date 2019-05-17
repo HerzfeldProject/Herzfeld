@@ -21,6 +21,7 @@ export class LoginComponent implements OnInit {
   returnUrl: string;
   userError = false;
   user1 = new user();
+  answer = null;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -46,14 +47,22 @@ export class LoginComponent implements OnInit {
   onSubmit() {
     this.user1.username = this.loginForm.controls.username.value;
     this.user1.password = this.loginForm.controls.password.value;
-    this.basesrv.authenticate(this.user1, data => {
-      if (data === 'true') {
+    this.basesrv.authenticate(this.user1, this.callback.bind(this));
+  }
+  callback(data) {
+    // while (data === null) {
+    //   this.basesrv.authenticate(this.user1, this.callback.bind(this));
+    // }
+    this.answer = data;
+    if(this.answer !== null) {
+      this.answer = this.answer.getElementsByTagName('AuthenticateResult')[0].innerHTML;
+      if (this.answer === 'true') {
         this.router.navigate([this.returnUrl]);
         this.loading = true;
       } else {
         console.log('errorrrr');
         this.userError = true;
       }
-    });
+    }
   }
 }

@@ -3,5 +3,5 @@ export class DataInstance {
   conceptName: string;
   startTime: Date;
   endTime: Date;
-  value: string;
+  value: number;
 }

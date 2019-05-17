@@ -1,10 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { IMultiSelectSettings, IMultiSelectTexts, IMultiSelectOption } from 'angular-2-dropdown-multiselect';
+import {ObjectToChartService} from './services/object-to-chart.service';
+import {BaseServiceService} from './services/baseService.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
+  providers: [ObjectToChartService, BaseServiceService]
 })
 export class AppComponent implements OnInit {
   // public serched = true;

@@ -9,6 +9,7 @@ import {IMultiSelectOption, IMultiSelectSettings} from 'angular-2-dropdown-multi
 // import { NgxXml2jsonService } from 'ngx-xml2json';
 import {DataRequest} from '../models/dataRequest';
 import {XmlToObjectService} from '../services/xml-to-object.service';
+import {SharedRequestService} from '../services/shared-request.service';
 // import {DataInstance} from '../models/dataInstance';
 // import {Plan} from '../models/plan';
 // import {parser} from 'xml2json';
@@ -20,7 +21,7 @@ import {XmlToObjectService} from '../services/xml-to-object.service';
 })
 export class StartComponent implements OnInit {
 
-  @Input() mainRequest: DataRequest;
+  mainRequest: DataRequest;
   public serched = true;
   fromDate: Date;
   toDate: Date;
@@ -39,7 +40,7 @@ export class StartComponent implements OnInit {
     from: false,
     to: false
   };
-  constructor(private valService: BaseServiceService, private _http: HttpClient, private basesrv: BaseServiceService, private xmltosrv: XmlToObjectService) {
+  constructor(private valService: BaseServiceService, private _http: HttpClient, private basesrv: BaseServiceService, private xmltosrv: XmlToObjectService, private sharedR: SharedRequestService) {
   }
   ngOnInit() {
     this.toDate = new Date();
@@ -60,11 +61,13 @@ export class StartComponent implements OnInit {
     request.endDate = this.toDate;
     request.stage = 'followUp' ; // The first stage you want to see
     this.mainRequest = request;
+    this.sharedR.changeRequest(request);
     this.serched = false;
-    this.basesrv.getCompliance(request, data => {
-      const plan = this.xmltosrv.prepareXMLofCompliance(data);
-      console.log(plan);
-    });
+    // send the request to the other pages
+    // this.basesrv.getCompliance(request, data => {
+    //   const plan = this.xmltosrv.prepareXMLofCompliance(data);
+    //   console.log(plan);
+    // });
     // this.basesrv.getSubPlanes(data => {
     //   const result = this.xmltosrv.prepareXMLofSubPlans(data);
     //   console.log(result);

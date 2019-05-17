@@ -1,6 +1,10 @@
 import { Component } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { Breakpoints, BreakpointState, BreakpointObserver } from '@angular/cdk/layout';
+import {DataRequest} from '../models/dataRequest';
+import {SharedRequestService} from '../services/shared-request.service';
+import {BaseServiceService} from '../services/baseService.service';
+import {XmlToObjectService} from '../services/xml-to-object.service';
 
 @Component({
   selector: 'app-follow-up-dashboard',
@@ -8,6 +12,7 @@ import { Breakpoints, BreakpointState, BreakpointObserver } from '@angular/cdk/l
   styleUrls: ['./follow-up-dashboard.component.css']
 })
 export class FollowUpDashboardComponent {
+  mainRequest: DataRequest;
   /** Based on the screen size, switch from standard to one column per row */
   cards = this.breakpointObserver.observe(Breakpoints.Handset).pipe(
     map(({ matches }) => {
@@ -29,13 +34,21 @@ export class FollowUpDashboardComponent {
     })
   );
 
-  constructor(private breakpointObserver: BreakpointObserver) {}
+  constructor(private breakpointObserver: BreakpointObserver, private sharedR: SharedRequestService, private basesrv: BaseServiceService, private xmltosrv: XmlToObjectService) {
+    this.sharedR.currentRequest.subscribe(data => this.mainRequest = data);
+    this.mainRequest = this.sharedR.request.value;
+    this.mainRequest.stage = 'followUp';
+    this.basesrv.getCompliance(this.mainRequest, data => {
+      const plan = this.xmltosrv.prepareXMLofCompliance(data);
+      console.log(plan);
+    });
+  }
 
   public expand = false;
-  public pieChartLabels:string[] = ['True','False'];
-  public pieChartData:number[] =  [0.8, 0.2];
-  public pieChartType:string = 'doughnut';
-  public pieChartOptions:any = {'backgroundColor': [
+  public pieChartLabels: string[] = ['True', 'False'];
+  public pieChartData: number[] =  [0.8, 0.2];
+  public pieChartType = 'doughnut';
+  public pieChartOptions: any = {'backgroundColor': [
     'rgba(255, 99, 132, 0.2)',
     'rgba(54, 162, 235, 0.2)',
     'rgba(255, 206, 86, 0.2)',
@@ -84,7 +97,7 @@ export class FollowUpDashboardComponent {
           'rgba(153, 102, 255, 0.2)',
           'rgba(255, 159, 64, 0.2)']
     };
-    public barChartLabels = ['skin','norton','pain'];
+    public barChartLabels = ['skin', 'norton', 'pain'];
     public barChartType = 'bar';
     public barChartLegend = true;
     public barChartData = [
@@ -95,19 +108,19 @@ export class FollowUpDashboardComponent {
       // {data: [0.5, 0.7, 1], label: 'more'}
     ];
   // events on slice click
-  public chartClicked(e:any):void {
+  public chartClicked(e: any): void {
     console.log(e);
   }
 
  // event on pie chart slice hover
-  public chartHovered(e:any):void {
+  public chartHovered(e: any): void {
     console.log(e);
   }
-  public expandData(){
-    console.log("erre")
+  public expandData() {
+    console.log('erre');
     this.expand = true;
   }
-  ngOnInit(){
+  ngOnInit() {
   }
 
 }
