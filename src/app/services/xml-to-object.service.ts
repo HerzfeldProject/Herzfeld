@@ -104,7 +104,35 @@ export class XmlToObjectService {
         relevantData.push(data[i]);
       }
     }
-    relevantData.sort((a, b) => {return b.value - a.value} );
+    relevantData.sort((a, b) => b.value - a.value );
     return relevantData;
+  }
+  fromPlanNameToRelevantConceptId(subPlan, name, isFirst) {
+    const conceptIds = [];
+    if (isFirst) {
+      for (let i = 0; i < subPlan.length; i++) {
+        if (subPlan[i].name === name) {
+          if (subPlan[i].conceptId !== undefined) {
+            conceptIds.push(subPlan[i].conceptId);
+            break;
+          } else {
+            const temp = subPlan[i].subPlans;
+            return this.fromPlanNameToRelevantConceptId(temp, name, false);
+          }
+        }
+      }
+    } else {
+        for (let k = 0; k < subPlan.length; k++) {
+          if (subPlan[k].conceptId !== undefined) {
+            conceptIds.push(subPlan[k].conceptId);
+          } else {
+            const addConcepts = this.fromPlanNameToRelevantConceptId(subPlan[k].subPlans, name, false);
+            for (let h = 0; h < addConcepts.length; h++) {
+              conceptIds.push(addConcepts[h]);
+            }
+          }
+        }
+    }
+    return conceptIds;
   }
 }

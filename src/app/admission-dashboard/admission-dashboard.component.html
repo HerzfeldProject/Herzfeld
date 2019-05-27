@@ -1,4 +1,20 @@
-<div class="grid-container col col-lg-12 col-md-12">
+<!--<app-loading-screen></app-loading-screen>-->
+<div *ngIf="pageError">
+<mat-grid-list  class="col col-lg-12 col-md-12" cols="1" >
+  <mat-grid-tile>
+    <mat-card class="dashboard-card">
+      <mat-card-header>
+        <mat-card-title>
+          <div ></div>
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content >
+        <div style="text-align: center; color: #0071c5; size: 300px">No Data In Admission Stage</div>
+      </mat-card-content>
+    </mat-card>
+  </mat-grid-tile>
+</mat-grid-list>
+</div><div *ngIf="!pageError" class="grid-container col col-lg-12 col-md-12">
     <h1 class="mat-h1" style="text-align: center">Admission</h1>
     <mat-grid-list class="col col-lg-12 col-md-12" cols="2" rowHeight="3:2">
       <mat-grid-tile>
@@ -28,11 +44,16 @@
                     <mat-card-title>
                       <h5 style="font-size: 20px; color: #0071c5">Detailed Admission Scores:
                       </h5>
+                      <h6 style="font-size: 15px;" id="moreDetails" *ngIf="levelOfDrillDown>0">
+                        {{detailText}}
+                      </h6>
                     </mat-card-title>
                 </mat-card-header>
                 <mat-card-content class="dashboard-card-content">
-                    <div style="display: block"> <canvas #bar baseChart [datasets]="admissionConcepts.datasets" [labels]="admissionConcepts.labels" [options]="admissionConcepts.options" [colors]="colorsConcepts" [chartType]="'bar'">
-              </canvas></div>
+                  <i (click)="onDrillUp()" matTooltip="Go Previous" style="cursor: pointer; float: right;margin-right: 0; font-size: 20px" *ngIf="levelOfDrillDown>0" class="fa fa-arrow-circle-left"></i>
+
+                  <div id="barDiv" style="display: block">
+             </div>
                 </mat-card-content>
             </mat-card>
         </mat-grid-tile>

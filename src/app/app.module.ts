@@ -6,7 +6,27 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {AppRoutingModule} from './app-routing.module';
 import { NavComponent } from './nav/nav.component';
 import { LayoutModule } from '@angular/cdk/layout';
-import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule, MatGridListModule, MatCardModule, MatMenuModule, MatFormFieldModule, MatDatepicker, MatDatepickerToggle, MatDialog, MatDialogModule, MatSelectModule, MatOptionModule, MatTableModule, MatPaginatorModule, MatSortModule } from '@angular/material';
+import {
+  MatToolbarModule,
+  MatButtonModule,
+  MatSidenavModule,
+  MatIconModule,
+  MatListModule,
+  MatGridListModule,
+  MatCardModule,
+  MatMenuModule,
+  MatFormFieldModule,
+  MatDatepicker,
+  MatDatepickerToggle,
+  MatDialog,
+  MatDialogModule,
+  MatSelectModule,
+  MatOptionModule,
+  MatTableModule,
+  MatPaginatorModule,
+  MatSortModule,
+  MatInputModule
+} from '@angular/material';
 import { AdmissionDashboardComponent } from './admission-dashboard/admission-dashboard.component';
 import { MultiselectDropdownModule } from 'angular-2-dropdown-multiselect';
 import { ChartsModule } from 'ng2-charts';
@@ -22,10 +42,13 @@ import { LoginComponent } from './authentication/login/login.component';
 import { NavModule } from './nav/nav.module';
 import { StartComponent } from './start/start.component';
 import {HttpModule} from '@angular/http';
-import {HttpClientModule} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {GoogleChartsModule} from 'angular-google-charts';
 import {Concepts} from './models/concepts';
 import {Weights} from './models/weights';
+import { BandagingDashboardComponent } from './bandaging-dashboard/bandaging-dashboard.component';
+import {ModalModule} from 'ng2-modal';
+import { LoadingScreenComponent } from './loading-screen/loading-screen.component';
 
 // import {NgxSoapModule} from 'ngx-soap';
 // import {Proxy, BasicHttpBinding} from 'wcf.js';
@@ -41,13 +64,16 @@ import {Weights} from './models/weights';
     TreatmentDashboardComponent,
     SummaryDashboardComponent,
     LoginComponent,
-    StartComponent
+    StartComponent,
+    BandagingDashboardComponent,
+    LoadingScreenComponent
   ],
   imports: [
     AngularFireModule.initializeApp(environment.firebase),
     // NgxSoapModule,
     // Proxy, BasicHttpBinding, ////
     GoogleChartsModule.forRoot(),
+    ModalModule,
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
@@ -74,15 +100,15 @@ import {Weights} from './models/weights';
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
-    NavModule
-
+    NavModule,
   ],
   exports: [
     FormsModule,
     ReactiveFormsModule,
     MatFormFieldModule,
+    MatDialogModule, MatFormFieldModule, MatButtonModule, MatInputModule
   ],
-  providers: [ Weights, Concepts ],
+  providers: [ Weights, Concepts],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -9,14 +9,14 @@
           </mat-card-title>
         </mat-card-header>
         <mat-card-content >
-          <div style="text-align: center; color: #0071c5; size: 300px">No Data In Follow Up And Prevention Stage</div>
+          <div style="text-align: center; color: #0071c5; size: 300px">No Data In Bandaging Stage</div>
         </mat-card-content>
       </mat-card>
     </mat-grid-tile>
   </mat-grid-list>
 </div>
 <div *ngIf="!pageError" class="grid-container col col-lg-12 col-md-12">
-  <h1 class="mat-h1" style="text-align: center">Follow Up And Prevention </h1>
+  <h1 class="mat-h1" style="text-align: center">Bandaging </h1>
   <mat-grid-list class="col col-lg-12 col-md-12" cols="2" rowHeight="3:2">
     <mat-grid-tile>
       <mat-card class="dashboard-card">
@@ -34,7 +34,7 @@
             </div>
           </h5></div>
           <div class="col-lg-9 col-md-9">
-            <canvas #mychart baseChart [data]="prevCompliance.finalValue" [labels]="['True','False']" [chartType]="'doughnut'" [options]="prevCompliance.options" [colors]="colorsCompliance" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+            <canvas #mychart baseChart [data]="bandCompliance.finalValue" [labels]="['True','False']" [chartType]="'doughnut'" [options]="bandCompliance.options" [colors]="colorsCompliance" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
           </div>
         </mat-card-content>
       </mat-card>
@@ -45,15 +45,11 @@
           <mat-card-title>
             <h5 style="font-size: 20px; color: #0071c5">Detailed Admission Scores:
             </h5>
-            <h6 style="font-size: 15px;" id="moreDetails">
-            </h6>
           </mat-card-title>
         </mat-card-header>
         <mat-card-content class="dashboard-card-content">
-          <i (click)="onDrillUp()" title="Go Back" style="cursor: pointer; float: right;margin-right: 0; font-size: 35px" *ngIf="levelOfDrillDown>0" class="fa fa-arrow-circle-left"></i>
-
-          <div id="barDiv" style="display: block">
-          </div>
+          <div style="display: block"> <canvas #bar baseChart [datasets]="bandConcepts.datasets" [labels]="bandConcepts.labels" [options]="bandConcepts.options" [colors]="colorsConcepts" [chartType]="'bar'">
+          </canvas></div>
         </mat-card-content>
       </mat-card>
     </mat-grid-tile>

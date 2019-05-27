@@ -10,12 +10,6 @@ import {LoginComponent} from './authentication/login/login.component';
 const routes: Route[] = [
   {path: '', pathMatch: 'full', redirectTo: 'login'},
   {path: 'login', component: LoginComponent}
-  // {path: 'admission', component: AdmissionDashboardComponent},
-  // {path: 'followup' , component: FollowUpDashboardComponent},
-  // {path: 'prevention', component: PreventionDashboardComponent},
-  // {path: 'treatment', component: TreatmentDashboardComponent},
-  // {path: 'summary', component: SummaryDashboardComponent},
-
 ];
 
 @NgModule({

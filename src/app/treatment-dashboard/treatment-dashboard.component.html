@@ -1,24 +1,89 @@
-<div class="grid-container">
-  <h1 class="mat-h1">Dashboard</h1>
-  <mat-grid-list cols="2" rowHeight="350px">
-    <mat-grid-tile *ngFor="let card of cards | async" [colspan]="card.cols" [rowspan]="card.rows">
+
+<div *ngIf="pageError">
+  <mat-grid-list  class="col col-lg-12 col-md-12" cols="1" >
+    <mat-grid-tile>
       <mat-card class="dashboard-card">
         <mat-card-header>
           <mat-card-title>
-            {{card.title}}
-            <button mat-icon-button class="more-button" [matMenuTriggerFor]="menu" aria-label="Toggle menu">
-              <mat-icon>more_vert</mat-icon>
-            </button>
-            <mat-menu #menu="matMenu" xPosition="before">
-              <button mat-menu-item>Expand</button>
-              <button mat-menu-item>Remove</button>
-            </mat-menu>
+            <div ></div>
           </mat-card-title>
         </mat-card-header>
-        <mat-card-content class="dashboard-card-content">
-          <div>Card Content Here</div>
+        <mat-card-content >
+          <div style="text-align: center; color: #0071c5; size: 300px">No Data In Follow Up, Prevention And Treatment Stage</div>
         </mat-card-content>
       </mat-card>
     </mat-grid-tile>
   </mat-grid-list>
+</div>
+<div *ngIf="!pageError" class="grid-container col col-lg-12 col-md-12">
+  <h1 class="mat-h1" style="text-align: center">Follow Up, Prevention And Treatment</h1>
+  <mat-grid-list class="col col-lg-12 col-md-12" cols="2" rowHeight="3:2">
+    <mat-grid-tile>
+      <mat-card class="dashboard-card">
+        <mat-card-header>
+          <mat-card-title>
+            <h5 style="font-size: 20px; color: #0071c5">Total Compliance Score:<br><br>
+            </h5>
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="col-lg-12 col-md-12">
+          <div class="col-lg-3 col-md-3"><h5>
+            Weight Distribution: <br><br>
+            <div *ngFor="let plan of mainPlan.subPlans">
+              {{plan.name}} - {{plan.weight *100}} % <br>
+            </div>
+          </h5></div>
+          <div class="col-lg-9 col-md-9">
+            <canvas #mychart baseChart [data]="treatCompliance.finalValue" [labels]="['True','False']" [chartType]="'doughnut'" [options]="treatCompliance.options" [colors]="colorsCompliance" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+    <mat-grid-tile rowHeight="fit">
+      <mat-card class="dashboard-card">
+        <mat-card-header>
+          <mat-card-title>
+            <h5 style="font-size: 20px; color: #0071c5">Detailed Admission Scores:
+            </h5>
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="dashboard-card-content">
+          <div style="display: block"> <canvas #bar baseChart [datasets]="treatConcepts.datasets" [labels]="treatConcepts.labels" [options]="treatConcepts.options" [colors]="colorsConcepts" [chartType]="'bar'">
+          </canvas></div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+  </mat-grid-list>
+  <mat-grid-list id="intervalesDashboard" class="col col-lg-12 col-md-12" cols="1" >
+    <mat-grid-tile >
+      <mat-card class="dashboard-card">
+        <mat-card-header>
+          <mat-card-title>
+            <div id="intervalsPatients"></div>
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content >
+          <div id="timelinediv" style="width: 100%"></div>
+          <div id="description">
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+  </mat-grid-list>
+  <mat-grid-list id="intervalesPatient" class="col col-lg-12 col-md-12" cols="1" >
+    <mat-grid-tile  rowHeight="fit">
+      <mat-card class="dashboard-card">
+        <mat-card-header>
+          <mat-card-title>
+            <div id="intervalsPatient"></div>
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content >
+          <div id="timelinediv2" style="display: block;width: 100%"></div>
+          <div id="description2"></div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+  </mat-grid-list>
+
 </div>

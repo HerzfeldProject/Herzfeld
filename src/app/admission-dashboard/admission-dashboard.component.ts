@@ -11,6 +11,7 @@ import {DataRequest} from '../models/dataRequest';
 import {SharedRequestService} from '../services/shared-request.service';
 import {Plan} from '../models/plan';
 import {ObjectToChartService} from '../services/object-to-chart.service';
+import {LoadingScreenService} from '../services/loading-screen.service';
 
 @Component({
   // selector: 'app-followup/admission-dashboard',
@@ -20,41 +21,61 @@ import {ObjectToChartService} from '../services/object-to-chart.service';
 })
 export class AdmissionDashboardComponent implements OnInit, AfterViewInit {
 
-public mainRequest: DataRequest;
-public checked = false;
+  public detailText = '';
+  public tempSubPlans = [];
+  public levels = [];
+  public levelOfDrillDown = 0;
+  public pageError = false;
+  public mainRequest: DataRequest;
+  public checked = false;
 // weights = Weights;
-public mainPlan = new Plan();
-title = 'app';
-public showIntervals = false;
-public colorsCompliance = [ {backgroundColor: ['#01b300', '#ed1d04']}];
-public colorsConcepts = [ {backgroundColor: ['#51bcc2', '#51bcc2', '#51bcc2', '#51bcc2', '#51bcc2', '#51bcc2']}];
-public admissionCompliance: PieChartData;
-public admissionConcepts: BarChartData;
+  public mainPlan = new Plan();
+  title = 'app';
+  public showIntervals = false;
+  public colorsCompliance = [{backgroundColor: ['#01b300', '#ed1d04']}];
+  public colorsConcepts = [{backgroundColor: ['#51bcc2', '#51bcc2', '#51bcc2', '#51bcc2', '#51bcc2', '#51bcc2']}];
+  public admissionCompliance: PieChartData;
+  public admissionConcepts: BarChartData;
 
-constructor(private admDashService: AdmissionDashboardService, public basesrv: BaseServiceService,   private route: ActivatedRoute,
-            private router: Router, private xmltosrv: XmlToObjectService,
-            private sharedR: SharedRequestService, private objToChart: ObjectToChartService) {
-  // this.onConceptClick.bind({'myapp': this});
-  this.mainRequest = this.sharedR.request.value;
-  this.mainRequest.stage = 'admission';
-  this.basesrv.getCompliance(this.mainRequest, data => {
-    this.mainPlan = this.xmltosrv.prepareXMLofCompliance(data);
-    console.log(this.mainPlan);
-    this.checked = false;
-    // create pie chart
-    this.admissionCompliance = this.objToChart.createPieChart(this.mainPlan.score);
-    // create bar chart
-    // this.admissionConcepts = this.objToChart.createBarChart(this.mainPlan.subPlans);
+  constructor(private admDashService: AdmissionDashboardService, public basesrv: BaseServiceService, private route: ActivatedRoute,
+              private router: Router, private xmltosrv: XmlToObjectService,
+              private sharedR: SharedRequestService, private objToChart: ObjectToChartService, private loadingScreenService: LoadingScreenService) {
+    this.mainRequest = this.sharedR.request.value;
+    this.mainRequest.stage = 'admission';
+    // followUpAndPrevention, followUpAndPreventionAndTreatment
+    if (localStorage.getItem('admission') !== null) {
+      if(localStorage.getItem('admission') == 'no data'){
+        this.pageError = true;
+      } else {
+        this.mainPlan = JSON.parse(localStorage.getItem('admission'));
+        console.log(this.mainPlan);
+        this.checked = false;
+        // create pie chart
+        this.admissionCompliance = this.objToChart.createPieChart(this.mainPlan.score);
+        // create bar chart
+        this.createBar(this.mainPlan.subPlans);
+      }
+    } else {
+      this.basesrv.getCompliance(this.mainRequest, this.callback.bind(this));
+    }
+  }
+  createBar(subPlans) {
+    this.tempSubPlans = subPlans;
+    // const ctx = (<HTMLCanvasElement> document.getElementById('myChart'));
+    // const canvas = ctx.getContext('2d');
+    // canvas.clearRect(0, 0, ctx.width, ctx.height);
     this.admissionConcepts = new BarChartData();
-    this.admissionConcepts.datasets =  [{data: [], label: 'Completion percentages', metadata: []}];
+    this.admissionConcepts.datasets = [{data: [], label: 'Completion percentages', metadata: [],
+      backgroundColor: ['#51bcc2', '#51bcc2', '#51bcc2', '#51bcc2', '#51bcc2', '#51bcc2']}, {label: 'line', data: [], type: 'line'}];
     this.admissionConcepts.labels = [];
-    for (let i = 0; i < this.mainPlan.subPlans.length; i++) {
-      this.admissionConcepts.labels.push(this.mainPlan.subPlans[i].name);
-      this.admissionConcepts.datasets[0].data.push(this.mainPlan.subPlans[i].score);
-      this.admissionConcepts.datasets[0].metadata.push(this.mainPlan.subPlans[i].conceptId);
+    for (let i = 0; i < subPlans.length; i++) {
+      this.admissionConcepts.labels.push(subPlans[i].name);
+      this.admissionConcepts.datasets[0].data.push(subPlans[i].score);
+      this.admissionConcepts.datasets[1].data.push(subPlans[i].score);
+      // admissionConcepts.datasets[0].metadata.push(subPlans[i].conceptId);
     }
     this.admissionConcepts.options = {
-      onClick: this.onConceptClick.bind(this),
+      onClick: this.onDrillDown.bind(this),
       responsive: true,
       scaleShowVerticalLines: false,
       scales: {
@@ -65,9 +86,67 @@ constructor(private admDashService: AdmissionDashboardService, public basesrv: B
         }]
       },
     };
-  });
-}
+    const father = document.getElementById('barDiv');
+    father.innerHTML = '';
+    const canvas = <HTMLCanvasElement>document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: this.admissionConcepts.labels,
+        datasets: this.admissionConcepts.datasets,
+      },
+      options: this.admissionConcepts.options
+    });
+    father.appendChild(canvas);
 
+  }
+  onDrillDown(c, i) {
+    this.levels.push(this.tempSubPlans);
+    if(this.levelOfDrillDown == 0){
+      this.detailText = '';
+    }
+    this.levelOfDrillDown ++;
+    const conceptName = i[0]._model.label;
+    let sub = [];
+    for(let i = 0; i < this.tempSubPlans.length; i++){
+      if(this.tempSubPlans[i].name == conceptName){
+        this.detailText = this.detailText + conceptName ;
+        sub = this.tempSubPlans[i].subPlans;
+        if(this.tempSubPlans[i].score !== undefined){
+          this.detailText = this.detailText + '-'+ Number(this.tempSubPlans[i].score).toFixed(2);
+        }
+        this.detailText = this.detailText + ' --> ';
+      }
+
+    }
+    this.createBar(sub);
+  }
+  onDrillUp(){
+    this.levelOfDrillDown --;
+    const lastArrow = this.detailText.lastIndexOf('-->');
+    const oneBefore = this.detailText.substring(0, lastArrow).lastIndexOf('-->');
+    this.detailText = this.detailText.substring(0, oneBefore + 3);
+    this.createBar(this.levels.pop());
+  }
+
+  callback(data){
+    this.loadingScreenService.stopLoading()
+    this.mainPlan = this.xmltosrv.prepareXMLofCompliance(data);
+    if(this.mainPlan.score == -1) {
+      localStorage.setItem('admission', 'no dada');
+      this.pageError = true;
+    } else {
+      localStorage.setItem('admission', JSON.stringify(this.mainPlan));
+      console.log(this.mainPlan);
+      this.checked = false;
+      // create pie chart
+      this.admissionCompliance = this.objToChart.createPieChart(this.mainPlan.score);
+      // create bar chart
+      this.createBar(this.mainPlan.subPlans);
+      // this.objToChart.createBarChart(this.mainPlan.subPlans, this.mainRequest);
+    }
+  }
   ngAfterViewInit() {
     Chart.pluginService.register({
       afterDraw: function (chart) {
@@ -94,120 +173,7 @@ constructor(private admDashService: AdmissionDashboardService, public basesrv: B
       },
     });
   }
-ngOnInit() {
 
-}
-  onConceptClick(c, i) {
-
-     const conceptName = i[0]._model.label;
-    // let clickedPlan;
-    // for (let j = 0; j < this.mainPlan.subPlans.length; j++) {
-    //   if(this.mainPlan.subPlans[i].name === conceptName) {
-    //     clickedPlan = this.mainPlan.subPlans[i];
-    //   }
-    // }
-    this.basesrv.getData(this.mainRequest, '11031', data => {
-      const temp = this.xmltosrv.prepareXMLofDATA(data);
-      const relevant = this.xmltosrv.createDataInstances(temp, this.mainRequest.startDate, this.mainRequest.endDate);
-
-      // calculateIntervalesForAllPatients
-      google.charts.load('current', { 'packages': ['corechart', 'timeline']});
-      google.charts.setOnLoadCallback(drawTimeLine.bind(relevant));
-
-      const titleOfIntervales = document.createElement('h5');
-      titleOfIntervales.style.color = '#0071c5';
-      titleOfIntervales.style.fontSize = '20px';
-      titleOfIntervales.textContent = conceptName + ' Compliance of Selected Patients';
-      document.getElementById('intervalsPatients').appendChild(titleOfIntervales);
-      document.getElementById('intervalesDashboard').focus();
-    });
-
-    // const tile = document.createElement('mat-grid-tile');
-    // tile.setAttribute('rowHeight', 'fit');
-    // const card = document.createElement('mat-card');
-    // card.setAttribute('class', 'dashboard-card');
-    // const head = document.createElement('mat-card-header');
-    // const title = document.createElement('mat-card-title');
-    // const div = document.createElement('div');
-    // div.setAttribute('id', 'intervalsPatients')
-    // const content = document.createElement('mat-card-content');
-    // const div2 = document.createElement('div');
-    // div2.setAttribute('id', 'timelinediv');
-    // div2.setAttribute('style', 'display: block;width: 100%');
-    // document.getElementById('intervalesDashboard').appendChild(tile.appendChild(
-    //   card.appendChild(head.appendChild(title.appendChild(div))).appendChild(content.appendChild(div2))));
-    function drawTimeLine(relevant) {
-      const container = document.getElementById('timelinediv');
-      const chart = new google.visualization.Timeline(container);
-      const dataTable = new google.visualization.DataTable();
-      dataTable.addColumn({ type: 'string', id: 'value' });
-      dataTable.addColumn({ type: 'date', id: 'Start' });
-      dataTable.addColumn({ type: 'date', id: 'End' });
-      // dataTable.addColumn({type: 'string', role: 'tooltip'});
-      dataTable.addRows([]);
-
-
-      // add option of number patients - combain
-      for (let i = 0; i < this.length; i++) {
-        let num  = this[i].value;
-        if (num.includes('.')) {
-          num = Number(num).toFixed(1);
-          if (num.includes('.0')) {
-            num = num.substring(0, 1);
-          }
-        }
-        dataTable.addRow([num, new Date(this[i].startTime), new Date(this[i].endTime)]); // , 'patients id\'s: ' + this[i].entityId ]);
-      }
-
-      // function myHandler(e) {
-      //   if (e.row != null) {
-      //     const gog = document.getElementsByClassName('google-visualization-tooltip')[0];
-      //     gog.innerHTML = dataTable.getValue(e.row, 3); // .css({width: "auto",height: "auto"});
-      //     gog.setAttribute('css', '{width: auto; height: auto}');
-      //   }
-      // }
-      const options = {
-        height: 40 + (dataTable.getNumberOfRows() * 15),
-        avoidOverlappingGridLines: false,
-        tooltip: { isHtml: true }
-      };
-      // google.visualization.events.addListener(chart, 'onmouseover', myHandler);
-      // google.visualization.events.addListener(chart, 'select', function () {
-      //   const modal = document.createElement('div');
-      //   modal.style.marginLeft = '10px';
-      //   modal.className = 'row well col-lg-4 col-md-4';
-      //   modal.style.fontWeight = 'bold';
-      //   modal.innerHTML = '<h5 style="color: #0071c5">Description</h5> <br>' +
-      //     'Patients: 311673313, 325846795, 201125689';
-      //   document.getElementById('description').appendChild(modal);
-      //
-      //   // this.checked = true;
-      //
-      //   // const form = document.createElement('mat-form-field');
-      //   // const select = document.createElement('mat-select');
-      //   // select.style.marginTop = '22px';
-      //   // select.setAttribute('placeholder', 'Choose Patient:');
-      //   //
-      //   // const op1 = document.createElement('mat-option');
-      //   // op1.textContent = '311673313';
-      //   // op1.setAttribute('click', 'onPatientClick(op1.textContent, conceptName)');
-      //   // const op2 = document.createElement('mat-option');
-      //   // op1.textContent = '325846795';
-      //   // const op3 = document.createElement('mat-option');
-      //   // op1.textContent = '201125689';
-      //   //
-      //   // document.getElementById('description').appendChild(form.appendChild(select.appendChild(op1).appendChild(op2).appendChild(op3)));
-      // });
-      chart.draw(dataTable, options);
-    }
-  }
-  // events on slice click
-  public chartClicked(e: any): void {
-    console.log(e);
-  }
-
-  // event on pie chart slice hover
-  public chartHovered(e: any): void {
-    console.log(e);
+  ngOnInit() {
   }
 }

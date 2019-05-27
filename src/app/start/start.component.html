@@ -1,6 +1,6 @@
-<div style="margin-top: 20px" class="row well col-lg-offset-2 col-md-offset-2 col-lg-8 col-md-8">
-  <div class="col-lg-12 col-md-12">
-    <div class="col-md-2 col-lg-2">
+<div style="margin-top: 100px" class="row well col-lg-offset-2 col-md-offset-1 col-lg-8 col-md-10">
+  <div class="col-sm-12 col-lg-12 col-md-12">
+    <div class="col-sm-2 col-md-1 col-lg-2">
       <mat-form-field>
         <mat-select [(ngModel)]='selectedBase' style="margin-top: 22px; " placeholder="Data based:">
           <mat-option value="1">time base</mat-option>
@@ -8,7 +8,7 @@
         </mat-select>
       </mat-form-field>
     </div>
-    <div class="col-md-3 col-lg-3">
+    <div class="col-sm-3 col-md-2 col-lg-3">
       <p class="input-group" style="margin-top: 35px;">
         <label style="margin-right: 10px">
           Start Date: </label>
@@ -16,7 +16,7 @@
         <owl-date-time #dt></owl-date-time>
       </p>
     </div>
-    <div class="col-md-3 col-lg-3">
+    <div class="col-sm-3 col-md-2 col-lg-3">
       <p class="input-group" style="margin-top: 35px;">
         <label style="margin-right: 10px">
           End Date: </label>
@@ -33,13 +33,13 @@
     <!--    </div>-->
     <!-- </div> -->
     <!-- <div class="col-lg-12 col-md-12"> -->
-    <div class="col-md-2 col-lg-2">
+    <div class="col-sm-2 col-md-2 col-lg-2">
       <p class="input-group" style="width:20px;margin-top: 5px;">
         <label>Patients:</label>
         <ss-multiselect-dropdown style="display: block; " [options]="myOptions" [(ngModel)]="optionsModel"  [settings]="multiSelectSettings"></ss-multiselect-dropdown>
       </p>
     </div>
-    <div class="col-md-2 col-lg-2">
+    <div class="col-sm-2 col-md-2 col-lg-2">
       <button class="btn btn-primary" style="width: 80px; margin-left: 20px; margin-top: 30px;" (click)="Submit()">Submit</button>
     </div>
     <!-- </div> -->

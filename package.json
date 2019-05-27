@@ -38,6 +38,7 @@
         "lodash": "^4.17.11",
         "ng-pick-datetime": "^6.0.16",
         "ng2-charts": "^2.0.0-beta.4",
+        "ng2-modal": "0.0.25",
         "ngx-soap": "^0.6.0",
         "ngx-xml2json": "^1.0.2",
         "rxjs": "~6.2.0",

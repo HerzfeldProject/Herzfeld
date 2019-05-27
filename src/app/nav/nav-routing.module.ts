@@ -7,6 +7,7 @@ import {TreatmentDashboardComponent} from '../treatment-dashboard/treatment-dash
 import {SummaryDashboardComponent} from '../summary-dashboard/summary-dashboard.component';
 import {NavComponent} from './nav.component';
 import {StartComponent} from '../start/start.component';
+import {BandagingDashboardComponent} from '../bandaging-dashboard/bandaging-dashboard.component';
 
 const routes: Routes = [
   {
@@ -18,7 +19,8 @@ const routes: Routes = [
       {path: 'followup' , component: FollowUpDashboardComponent},
       {path: 'prevention', component: PreventionDashboardComponent},
       {path: 'treatment', component: TreatmentDashboardComponent},
-      {path: 'summary', component: SummaryDashboardComponent}
+      {path: 'summary', component: SummaryDashboardComponent},
+      {path: 'bandaging', component: BandagingDashboardComponent},
     ]
   }
 ];

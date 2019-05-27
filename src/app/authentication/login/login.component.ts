@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 
-import { Router, ActivatedRoute } from '@angular/router';
+import {Router, ActivatedRoute, RouterEvent, NavigationStart, NavigationEnd, NavigationCancel, NavigationError} from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
 import {BaseServiceService} from '../../services/baseService.service';
 import {user} from '../../models/user';
+import {LoadingScreenService} from '../../services/loading-screen.service';
 // import {AlertService} from '../../services/alert.service';
 // import {AuthenticationService} from '../../services/authentication.service';
 // import { AlertService, AuthenticationService } from '@/_services';
@@ -23,12 +24,27 @@ export class LoginComponent implements OnInit {
   user1 = new user();
   answer = null;
 
+  // @HostListener('window:beforeunload')
+  // doSomething() {
+  //   do {
+  //     this.loading = true;
+  //     this.basesrv.authenticate(this.user1, this.callback.bind(this));
+  //   } while (this.answer === null);
+  // }
+
   constructor(
     private formBuilder: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private basesrv: BaseServiceService
+    private basesrv: BaseServiceService,
+    private loadingScreenService: LoadingScreenService
   ) {
+    // window.onbeforeunload = function (e) {
+    //     do {
+    //       this.loading = true;
+    //       this.basesrv.authenticate(this.user1, this.callback.bind(this));
+    //     } while (this.answer === null);
+    // }
   }
 
   ngOnInit() {
@@ -39,6 +55,10 @@ export class LoginComponent implements OnInit {
 
     // get return url from route parameters or default to '/'
     this.returnUrl = 'nav';
+
+    this.basesrv.getSubPlanes(function(data){
+      console.log(data)
+    })
   }
 
   // convenience getter for easy access to form fields
@@ -47,6 +67,7 @@ export class LoginComponent implements OnInit {
   onSubmit() {
     this.user1.username = this.loginForm.controls.username.value;
     this.user1.password = this.loginForm.controls.password.value;
+    this.loadingScreenService.startLoading();
     this.basesrv.authenticate(this.user1, this.callback.bind(this));
   }
   callback(data) {
@@ -54,13 +75,14 @@ export class LoginComponent implements OnInit {
     //   this.basesrv.authenticate(this.user1, this.callback.bind(this));
     // }
     this.answer = data;
+    this.loadingScreenService.stopLoading();
     if(this.answer !== null) {
-      this.answer = this.answer.getElementsByTagName('AuthenticateResult')[0].innerHTML;
-      if (this.answer === 'true') {
-        this.router.navigate([this.returnUrl]);
+          this.answer = this.answer.getElementsByTagName('AuthenticateResult')[0].innerHTML;
+        if (this.answer === 'true') {
+          this.router.navigate([this.returnUrl]);
         this.loading = true;
       } else {
-        console.log('errorrrr');
+        alert('error');
         this.userError = true;
       }
     }

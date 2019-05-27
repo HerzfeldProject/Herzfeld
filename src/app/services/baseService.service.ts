@@ -4,6 +4,7 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {from, Observable} from 'rxjs';
 import {DataInstance} from '../models/dataInstance';
 import {Plan} from '../models/plan';
+import {LoadingScreenService} from './loading-screen.service';
 // import {Observable} from 'rxjs';
 // import * as $ from 'jquery';
 
@@ -15,17 +16,17 @@ export class BaseServiceService implements OnInit {
 
   public proxy;
   public message;
-  constructor( private _http: HttpClient) { }
+  constructor( private _http: HttpClient, private loadingScreenService: LoadingScreenService) { }
 
   ngOnInit() {
   }
 
   public getCompliance(request, callback)  {
     const xmlreq = new XMLHttpRequest();
-    xmlreq.open('POST', 'https://medinfo2.ise.bgu.ac.il/MediatorNewTAK/complianceAPI/complianceAPI.svc', true);
+    xmlreq.open('POST', 'http://medinfo2.ise.bgu.ac.il/MediatorNewTAK/complianceAPI/complianceAPI.svc', true);
     xmlreq.setRequestHeader('Content-Type', 'text/xml;charset=utf-8');
     xmlreq.responseType = 'document';
-    const message2 = '<s:Envelope xmlns:s="https://schemas.xmlsoap.org/soap/envelope/">\n' +
+    const message2 = '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">\n' +
       '<s:Body>' +
       '<GetCompliance xmlns="http://tempuri.org/">' +
       '<state>' + request.stage + '</state>' +
@@ -37,7 +38,7 @@ export class BaseServiceService implements OnInit {
       '</GetCompliance>' +
       '</s:Body>' +
       '</s:Envelope>';
-    xmlreq.setRequestHeader('SOAPAction', 'https://tempuri.org/IComplianceAPI/GetCompliance');
+    xmlreq.setRequestHeader('SOAPAction', 'http://tempuri.org/IComplianceAPI/GetCompliance');
     xmlreq.onreadystatechange = function () {
       if (xmlreq.readyState === 4) {
         if (xmlreq.status === 200 ) {
@@ -49,21 +50,22 @@ export class BaseServiceService implements OnInit {
         }
       }
     };
+    // xmlreq.timeout = 4000; // Set timeout to 4 seconds (4000 milliseconds)
     xmlreq.send(message2);
   }
   public getSubPlanes(callback)  {
     const xmlreq = new XMLHttpRequest();
-    xmlreq.open('POST', 'https://medinfo2.ise.bgu.ac.il/MediatorNewTAK/complianceAPI/complianceAPI.svc', true);
+    xmlreq.open('POST', 'http://medinfo2.ise.bgu.ac.il/MediatorNewTAK/complianceAPI/complianceAPI.svc', true);
     xmlreq.setRequestHeader('Content-Type', 'text/xml;charset=utf-8');
     xmlreq.responseType = 'document';
-    const message = '<s:Envelope xmlns:s="https://schemas.xmlsoap.org/soap/envelope/">\n' +
+    const message = '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">\n' +
       '<s:Body>' +
       '<GetSubPlans xmlns="http://tempuri.org/">' +
       '<projectId>27</projectId>' +
       '</GetSubPlans>' +
       '</s:Body>' +
       '</s:Envelope>';
-    xmlreq.setRequestHeader('SOAPAction', 'https://tempuri.org/IComplianceAPI/GetSubPlans');
+    xmlreq.setRequestHeader('SOAPAction', 'http://tempuri.org/IComplianceAPI/GetSubPlans');
     xmlreq.onreadystatechange = function () {
       if (xmlreq.readyState === 4) {
         if (xmlreq.status === 200) {
@@ -77,17 +79,17 @@ export class BaseServiceService implements OnInit {
   }
   public getPatients(callback) {
   const xmlreq = new XMLHttpRequest();
-  xmlreq.open('POST', 'https://medinfo2.ise.bgu.ac.il/MediatorNewTAK/AdministrationAPI/AdministrationAPI.svc', true);
+  xmlreq.open('POST', 'http://medinfo2.ise.bgu.ac.il/MediatorNewTAK/AdministrationAPI/AdministrationAPI.svc', true);
   xmlreq.setRequestHeader('Content-Type', 'text/xml;charset=utf-8');
   xmlreq.responseType = 'document';
-    const message = '<s:Envelope xmlns:s="https://schemas.xmlsoap.org/soap/envelope/">\n' +
+    const message = '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">\n' +
       '<s:Body>' +
       '<GetPatients xmlns="http://tempuri.org/">' +
       '<projectId>27</projectId>' +
       '</GetPatients>' +
       '</s:Body>' +
       '</s:Envelope>';
-  xmlreq.setRequestHeader('SOAPAction', 'https://tempuri.org/IAdministrationService/GetPatients');
+  xmlreq.setRequestHeader('SOAPAction', 'http://tempuri.org/IAdministrationService/GetPatients');
   xmlreq.onreadystatechange = function () {
     if (xmlreq.readyState === 4) {
       if (xmlreq.status === 200) {
@@ -95,7 +97,7 @@ export class BaseServiceService implements OnInit {
         ('GetPatientsResult')[0].childNodes;
         console.log(result);
         callback.apply(this, [result]);
-        xmlreq.abort();
+        // xmlreq.abort();
       }
     }
   };
@@ -104,18 +106,18 @@ export class BaseServiceService implements OnInit {
   public getKnowledge(callback) {
     let result: XMLDocument;
     const xmlreq = new XMLHttpRequest();
-    xmlreq.open('POST', 'https://medinfo2.ise.bgu.ac.il/MediatorNewTAK/complianceAPI/complianceAPI.svc', true);
+    xmlreq.open('POST', 'http://medinfo2.ise.bgu.ac.il/MediatorNewTAK/complianceAPI/complianceAPI.svc', true);
     xmlreq.setRequestHeader('Content-Type', 'text/xml;charset=utf-8');
     xmlreq.responseType = 'document';
 
-    const message = '<s:Envelope xmlns:s="https://schemas.xmlsoap.org/soap/envelope/">\n' +
+    const message = '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">\n' +
       '<s:Body>' +
       '<GetKnowledge xmlns="http://tempuri.org/">' +
       '<projectId>27</projectId>' +
       '</GetKnowledge>' +
       '</s:Body>' +
       '</s:Envelope>';
-    xmlreq.setRequestHeader('SOAPAction', 'https://tempuri.org/IComplianceAPI/GetKnowledge');
+    xmlreq.setRequestHeader('SOAPAction', 'http://tempuri.org/IComplianceAPI/GetKnowledge');
     xmlreq.onreadystatechange = function () {
       if (xmlreq.readyState === 4) {
         if (xmlreq.status === 200) {
@@ -123,7 +125,7 @@ export class BaseServiceService implements OnInit {
           result = parser.parseFromString(xmlreq.responseXML.getElementsByTagName
           ('GetKnowledgeResult')[0].childNodes[0].textContent, 'text/xml');
           callback.apply(this, [result]);
-          xmlreq.abort();
+          // xmlreq.abort();
         }
       }
     };
@@ -160,7 +162,7 @@ export class BaseServiceService implements OnInit {
       }
     };
     xmlreq.send(message);
-    xmlreq.abort();
+    //xmlreq.abort();
   }
   public authenticate(user, callback){
     const xmlreq = new XMLHttpRequest();
@@ -194,6 +196,8 @@ export class BaseServiceService implements OnInit {
     //       callback.apply(this, [result]);
     //     }
     // };
+    // xmlreq.timeout = 4000; // Set timeout to 4 seconds (4000 milliseconds)
+    // xmlreq.ontimeout = function () { alert("Timed out!!!"); }
     xmlreq.send(message);
     }
   }

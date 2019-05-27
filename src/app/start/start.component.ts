@@ -10,6 +10,7 @@ import {IMultiSelectOption, IMultiSelectSettings} from 'angular-2-dropdown-multi
 import {DataRequest} from '../models/dataRequest';
 import {XmlToObjectService} from '../services/xml-to-object.service';
 import {SharedRequestService} from '../services/shared-request.service';
+import {LoadingScreenService} from '../services/loading-screen.service';
 // import {DataInstance} from '../models/dataInstance';
 // import {Plan} from '../models/plan';
 // import {parser} from 'xml2json';
@@ -40,7 +41,7 @@ export class StartComponent implements OnInit {
     from: false,
     to: false
   };
-  constructor(private valService: BaseServiceService, private _http: HttpClient, private basesrv: BaseServiceService, private xmltosrv: XmlToObjectService, private sharedR: SharedRequestService) {
+  constructor(private valService: BaseServiceService, private _http: HttpClient, private basesrv: BaseServiceService, private xmltosrv: XmlToObjectService, private sharedR: SharedRequestService,private loadingScreenService: LoadingScreenService) {
   }
   ngOnInit() {
     this.toDate = new Date();
@@ -50,11 +51,14 @@ export class StartComponent implements OnInit {
     });
   }
   Submit() {
+
+    this.loadingScreenService.loading = true;
+    localStorage.clear();
     const request = new DataRequest();
     if (this.selectedBase === '1') {
       request.type = 1;
     } else if (this.selectedBase === '2') {
-      request.type = 2;
+      request.type = 0;
     }
     request.patientsList = this.optionsModel;
     request.startDate = this.fromDate;

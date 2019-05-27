@@ -1,24 +1,21 @@
 import {AfterViewInit, Component, OnInit} from '@angular/core';
-import { map } from 'rxjs/operators';
-import { Breakpoints, BreakpointState, BreakpointObserver } from '@angular/cdk/layout';
 import {DataRequest} from '../models/dataRequest';
 import {Plan} from '../models/plan';
 import {PieChartData} from '../models/pieChartData';
 import {BarChartData} from '../models/barChartData';
+import {Chart} from 'chart.js';
 import {AdmissionDashboardService} from '../admission-dashboard/admission-dashboard.service';
 import {BaseServiceService} from '../services/baseService.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {XmlToObjectService} from '../services/xml-to-object.service';
 import {SharedRequestService} from '../services/shared-request.service';
 import {ObjectToChartService} from '../services/object-to-chart.service';
-import {Chart} from 'chart.js';
-
 @Component({
-  selector: 'app-treatment-dashboard',
-  templateUrl: './treatment-dashboard.component.html',
-  styleUrls: ['./treatment-dashboard.component.css']
+  selector: 'app-bandaging-dashboard',
+  templateUrl: './bandaging-dashboard.component.html',
+  styleUrls: ['./bandaging-dashboard.component.css']
 })
-export class TreatmentDashboardComponent implements OnInit, AfterViewInit{
+export class BandagingDashboardComponent implements OnInit, AfterViewInit {
 
   public pageError = false;
   public mainRequest: DataRequest;
@@ -28,40 +25,41 @@ export class TreatmentDashboardComponent implements OnInit, AfterViewInit{
   title = 'app';
   public showIntervals = false;
   public colorsCompliance = [ {backgroundColor: ['#01b300', '#ed1d04']}];
-  public colorsConcepts = [ {backgroundColor: ['#d3a93e', '#d3a93e', '#d3a93e', '#d3a93e', '#d3a93e', '#d3a93e', '#d3a93e', '#d3a93e', '#d3a93e']}];
-  public treatCompliance: PieChartData;
-  public treatConcepts: BarChartData;
+  public colorsConcepts = [ {backgroundColor: ['#87cf78', '#87cf78', '#87cf78', '#87cf78', '#87cf78', '#87cf78', '#87cf78', '#87cf78', '#87cf78']}];
+  public prevCompliance: PieChartData;
+  public prevConcepts: BarChartData;
 
   constructor(private admDashService: AdmissionDashboardService, public basesrv: BaseServiceService,   private route: ActivatedRoute,
               private router: Router, private xmltosrv: XmlToObjectService,
               private sharedR: SharedRequestService, private objToChart: ObjectToChartService) {
     this.mainRequest = this.sharedR.request.value;
-    this.mainRequest.stage = 'followUpAndPreventionAndTreatment';
+    this.mainRequest.stage = 'bandaging';
     // followUpAndPrevention, followUpAndPreventionAndTreatment
-    if(localStorage.getItem('followUpAndPreventionAndTreatment') !== null) {
-      if(localStorage.getItem('followUpAndPreventionAndTreatment') == 'no data'){
+    if(localStorage.getItem('bandaging') !== null ) {
+      if(localStorage.getItem('bandaging') == 'no data'){
         this.pageError = true;
       } else {
-        this.mainPlan = JSON.parse(localStorage.getItem('followUpAndPreventionAndTreatment'));
+        this.mainPlan = JSON.parse(localStorage.getItem('bandaging'));
         this.checked = false;
         // create pie chart
-        this.treatCompliance = this.objToChart.createPieChart(this.mainPlan.score);
+        this.prevCompliance = this.objToChart.createPieChart(this.mainPlan.score);
         // create bar chart
-        this.treatConcepts = this.objToChart.createBarChart(this.mainPlan.subPlans, this.mainRequest);
+        this.prevConcepts = this.objToChart.createBarChart(this.mainPlan.subPlans, this.mainRequest);
       }
+
     } else {
       this.basesrv.getCompliance(this.mainRequest, data => {
         this.mainPlan = this.xmltosrv.prepareXMLofCompliance(data);
         if(this.mainPlan.score == -1) {
-          localStorage.setItem('followUpAndPreventionAndTreatment', 'no data')
           this.pageError = true;
+          localStorage.setItem('bandaging', 'no data');
         } else {
-          localStorage.setItem('followUpAndPreventionAndTreatment', JSON.stringify(this.mainPlan));
+          localStorage.setItem('bandaging', JSON.stringify(this.mainPlan));
           this.checked = false;
           // create pie chart
-          this.treatCompliance = this.objToChart.createPieChart(this.mainPlan.score);
+          this.prevCompliance = this.objToChart.createPieChart(this.mainPlan.score);
           // create bar chart
-          this.treatConcepts = this.objToChart.createBarChart(this.mainPlan.subPlans, this.mainRequest);
+          this.prevConcepts = this.objToChart.createBarChart(this.mainPlan.subPlans, this.mainRequest);
         }
       });
     }
