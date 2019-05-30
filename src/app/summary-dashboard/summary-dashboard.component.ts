@@ -38,7 +38,6 @@ export class SummaryDashboardComponent {
     this.mainRequest = this.sharedR.request.value;
     this.mainRequest.stage = 'Summary';
     if (localStorage.getItem('summary') !== null) {
-
       const data = JSON.parse(localStorage.getItem('summary'));
       this.sumCompliance = this.objToChart.createPieChart(data.score);
       // show every stage score
@@ -52,7 +51,10 @@ export class SummaryDashboardComponent {
         if (localStorage.getItem(this.mainPlan[k].name) !== null) {
           totalscore.push({'name': this.mainPlan[k].name, 'weight': this.mainPlan[k].weight,
             'score': (JSON.parse(localStorage.getItem(this.mainPlan[k].name)).score )});
-        } // if dont exist need to do getCompliance
+        } else {
+          // send the stage name/ the correct request
+          // this.basesrv.getCompliance(this.mainRequest, this.callback.bind(this))
+        }
       }
       // calc total score
       let sum = 0;
@@ -68,6 +70,27 @@ export class SummaryDashboardComponent {
     }
     console.log(this.mainPlan);
 
+  }
+  callback(data){
+    // get the stage and
+    // this.loadscreenService.stopLoading();
+    this.mainPlan = this.xmltosrv.prepareXMLofCompliance(data);
+    if(this.mainPlan.score == -1){
+      this.pageError = true;
+      localStorage.setItem('followUp', 'no data');
+    } else {
+      localStorage.setItem('followUp', JSON.stringify(this.mainPlan));
+      console.log(this.mainPlan);
+      this.checked = false;
+      // create pie chart
+      // this.followUpCompliance = this.objToChart.createPieChart(this.mainPlan.score);
+      // create bar chart
+      // this.createBar(this.mainPlan.subPlans);
+      // this.followUpConcepts = this.objToChart.createBarChart(this.mainPlan.subPlans, this.mainRequest);
+    }
+
+    // totalscore.push({'name': this.mainPlan[k].name, 'weight': this.mainPlan[k].weight,
+    //   'score': (JSON.parse(localStorage.getItem(this.mainPlan[k].name)).score )});
   }
 }
 

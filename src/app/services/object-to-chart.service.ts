@@ -25,7 +25,7 @@ export class ObjectToChartService {
         center: {
           text: Math.round(score * 100) + '%',
           fontColor: '#25b400',
-          fontSize: 50,
+          fontSize: 30,
           fontStyle: 'normal',
           sidePadding: 20
         }

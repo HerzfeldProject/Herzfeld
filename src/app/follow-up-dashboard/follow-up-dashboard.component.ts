@@ -19,6 +19,7 @@ import {LoadingScreenService} from '../services/loading-screen.service';
 })
 export class FollowUpDashboardComponent implements AfterViewInit, OnInit {
 
+  public endDrill = false;
   public detailText = '';
   public tempSubPlans = [];
   public levels = [];
@@ -39,8 +40,8 @@ export class FollowUpDashboardComponent implements AfterViewInit, OnInit {
               private loadscreenService: LoadingScreenService, private basesrv: BaseServiceService, private xmltosrv: XmlToObjectService, private objToChart: ObjectToChartService) {
     this.mainRequest = this.sharedR.request.value;
     this.mainRequest.stage = 'followUp';
-    if(localStorage.getItem('followUp') !== null){
-      if(localStorage.getItem('followUp') == 'no  data'){
+    if (localStorage.getItem('followUp') !== null) {
+      if (localStorage.getItem('followUp') === 'no  data') {
         this.pageError = true;
       } else {
         this.mainPlan = JSON.parse(localStorage.getItem('followUp'));
@@ -57,7 +58,7 @@ export class FollowUpDashboardComponent implements AfterViewInit, OnInit {
       this.basesrv.getCompliance(this.mainRequest, data => {
         this.loadscreenService.stopLoading();
         this.mainPlan = this.xmltosrv.prepareXMLofCompliance(data);
-        if(this.mainPlan.score == -1){
+        if (this.mainPlan.score == -1) {
           this.pageError = true;
           localStorage.setItem('followUp', 'no data');
         } else {
@@ -74,6 +75,10 @@ export class FollowUpDashboardComponent implements AfterViewInit, OnInit {
     }
   }
   createBar(subPlans) {
+    const father = document.getElementById('barDiv');
+    father.innerHTML = '';
+    const canvas = <HTMLCanvasElement>document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
     this.tempSubPlans = subPlans;
     this.followUpConcepts = new BarChartData();
     this.followUpConcepts.datasets = [{data: [], label: 'Completion percentages', metadata: [],
@@ -84,21 +89,23 @@ export class FollowUpDashboardComponent implements AfterViewInit, OnInit {
       this.followUpConcepts.datasets[0].data.push(subPlans[i].score);
     }
     this.followUpConcepts.options = {
+      events: ['mousemove', 'click'], // this is needed, otherwise onHover is not fired
+      onHover: (event, chartElement) => {
+        event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+      },
       onClick: this.onDrillDown.bind(this),
       responsive: true,
       scaleShowVerticalLines: false,
       scales: {
         yAxes: [{
+          stacked: false,
           ticks: {
             beginAtZero: true
           }
         }]
       },
     };
-    const father = document.getElementById('barDiv');
-    father.innerHTML = '';
-    const canvas = <HTMLCanvasElement>document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+
     const chart = new Chart(ctx, {
       type: 'bar',
       data: {
@@ -111,23 +118,30 @@ export class FollowUpDashboardComponent implements AfterViewInit, OnInit {
 
   }
   onDrillDown(c, i) {
+    if (this.endDrill) {
+      const lastArrow = this.detailText.lastIndexOf('<i class="fa fa-arrow-right"></i>');
+      const oneBefore = this.detailText.substring(0, lastArrow).lastIndexOf('<i class="fa fa-arrow-right"></i>');
+      this.detailText = this.detailText.substring(0, oneBefore + 33);
+    }
     this.levels.push(this.tempSubPlans);
-    if(this.levelOfDrillDown == 0){
+    if (this.levelOfDrillDown == 0) {
       this.detailText = '';
     }
     this.levelOfDrillDown ++;
     const conceptName = i[0]._model.label;
     let sub = [];
     let textToAdd = '';
-    for(let i = 0; i < this.tempSubPlans.length; i++){
-      if(this.tempSubPlans[i].name == conceptName){
+    for (let i = 0; i < this.tempSubPlans.length; i++) {
+      if (this.tempSubPlans[i].name == conceptName) {
         textToAdd = conceptName ;
         sub = this.tempSubPlans[i].subPlans;
-        if(this.tempSubPlans[i].score !== undefined){
-          textToAdd = textToAdd + ' - '+ Number(this.tempSubPlans[i].score).toFixed(2);
+        if (this.tempSubPlans[i].score !== undefined) {
+          this.endDrill = false;
+          textToAdd = textToAdd + ' - ' + Number(this.tempSubPlans[i].score).toFixed(2);
         }
-        if(this.tempSubPlans[i].conceptId !== undefined){
-          textToAdd = '<button title="Show Time Intervals" (click)="' + this.onConceptInterval( conceptName , this.tempSubPlans[i].conceptId) + '">' + textToAdd + '</button>';
+        if (this.tempSubPlans[i].conceptId !== undefined) {
+          textToAdd = '<button title="Show Time Intervals" (click)="' +
+            this.onConceptInterval( conceptName , this.tempSubPlans[i].conceptId) + '">' + textToAdd + '</button>';
         }
         textToAdd = textToAdd + '<i class="fa fa-arrow-right"></i> ';
         this.detailText = this.detailText + textToAdd;
@@ -135,19 +149,22 @@ export class FollowUpDashboardComponent implements AfterViewInit, OnInit {
       }
     }
     document.getElementById('moreDetails').innerHTML = this.detailText;
-    this.createBar(sub);
+    if (sub[0].score !== undefined) {
+      this.createBar(sub);
+    } else {      this.endDrill = true;
+    }
   }
-  onDrillUp(){
+  onDrillUp() {
     this.levelOfDrillDown --;
-    if(this.levelOfDrillDown == 0){
+    if (this.levelOfDrillDown === 0) {
       this.detailText = '';
-    } else if(this.levelOfDrillDown == 1) {
-      const oneBefore = this.detailText.lastIndexOf('<i class="fa fa-arrow-right"></i> ');
-      this.detailText = this.detailText.substring(0, oneBefore + 3);
-    }else{
-      const lastArrow = this.detailText.lastIndexOf('<i class="fa fa-arrow-right"></i> ');
-      const oneBefore = this.detailText.substring(0, lastArrow).lastIndexOf('<i class="fa fa-arrow-right"></i> ');
-      this.detailText = this.detailText.substring(0, oneBefore + 3);
+    // } else if (this.levelOfDrillDown === 1) {
+    //   const oneBefore = this.detailText.lastIndexOf('<i class="fa fa-arrow-right"></i>');
+    //   this.detailText = this.detailText.substring(0, oneBefore + 33);
+    }    else {
+      const lastArrow = this.detailText.lastIndexOf('<i class="fa fa-arrow-right"></i>');
+      const oneBefore = this.detailText.substring(0, lastArrow).lastIndexOf('<i class="fa fa-arrow-right"></i>');
+      this.detailText = this.detailText.substring(0, oneBefore + 33);
     }
     document.getElementById('moreDetails').innerHTML = this.detailText;
     this.createBar(this.levels.pop());
@@ -161,10 +178,6 @@ export class FollowUpDashboardComponent implements AfterViewInit, OnInit {
   public chartHovered(e: any): void {
     console.log(e);
   }
-  // public expandData() {
-  //   console.log('erre');
-  //   this.expand = true;
-  // }
   ngOnInit() {
   }
 
@@ -181,53 +194,49 @@ export class FollowUpDashboardComponent implements AfterViewInit, OnInit {
         const temp = this.xmltosrv.prepareXMLofDATA(data);
         const relevant = this.xmltosrv.createDataInstances(temp, this.mainRequest.startDate, this.mainRequest.endDate);
 
-        if(relevant.length == 0){
-          let empty = document.createElement('h2');
+        if (relevant.length === 0) {
+          const empty = document.createElement('h2');
           empty.textContent = 'no data for ' + name;
           document.getElementById('timelinediv').appendChild(empty);
 
         } else {
           ////////////////////////
-          google.charts.load('current', {'packages':['annotatedtimeline']});
-          google.charts.setOnLoadCallback(drawChart);
-
-          ////////////////////////
           // calculateIntervalesForAllPatients
-          // google.charts.load('current', {'packages': ['annotatedtimeline']});//
-          // google.charts.setOnLoadCallback(drawTimeLine.bind(relevant));
-          //
-          // const titleOfIntervales = document.createElement('h5');
-          // titleOfIntervales.style.color = '#0071c5';
-          // titleOfIntervales.style.fontSize = '20px';
-          // let text = name + ' Compliance of Patients: '+ this.mainRequest.patientsList+'<br><br>';
-          // text = text + 'Start date: ' + this.mainRequest.startDate.toDateString() +'<br><br>';
-          // text = text + 'End date:' + this.mainRequest.endDate.toDateString() +'<br><br>';
-          // titleOfIntervales.innerHTML = text;
-          // document.getElementById('intervalsPatients').appendChild(titleOfIntervales);
-          // document.getElementById('intervalesDashboard').focus();
+          google.charts.load('current', {'packages': ['corechart', 'timeline']});
+          google.charts.setOnLoadCallback(drawTimeLine.bind(relevant));
+
+          const titleOfIntervales = document.createElement('h5');
+          titleOfIntervales.style.color = '#0071c5';
+          titleOfIntervales.style.fontSize = '20px';
+          let text = name + ' Compliance of Patients: ' + this.mainRequest.patientsList + '<br><br>';
+          text = text + 'Start date: ' + this.mainRequest.startDate.toDateString() + '<br><br>';
+          text = text + 'End date:' + this.mainRequest.endDate.toDateString() +  '<br><br>';
+          titleOfIntervales.innerHTML = text;
+          document.getElementById('intervalsPatients').appendChild(titleOfIntervales);
+          document.getElementById('intervalesDashboard').focus();
         }
       });
-    function drawChart() {
-      var data = new google.visualization.DataTable();
-      data.addColumn('date', 'Date');
-      data.addColumn('number', 'Sold Pencils');
-      data.addColumn('string', 'title1');
-      data.addColumn('string', 'text1');
-      data.addRows([
-        [new Date(2008, 1 ,1), 30000, undefined, undefined],
-        [new Date(2008, 1 ,2), 14045, undefined, undefined],
-        [new Date(2008, 1 ,3), 55022, undefined, undefined],
-        [new Date(2008, 1 ,4), 75284, undefined, undefined],
-        [new Date(2008, 1 ,5), 41476, 'Bought Pens','Bought 200k pens'],
-        [new Date(2008, 1 ,6), 33322, undefined, undefined]
-      ]);
-
-      var chart = new google.visualization.AnnotationChart(document.getElementById('timelinediv'));
-      chart.draw(data, {displayAnnotations: false});
-    }
+    // function drawChart() {
+    //   var data = new google.visualization.DataTable();
+    //   data.addColumn('date', 'Date');
+    //   data.addColumn('number', 'Sold Pencils');
+    //   data.addColumn('string', 'title1');
+    //   data.addColumn('string', 'text1');
+    //   data.addRows([
+    //     [new Date(2008, 1 ,1), 30000, undefined, undefined],
+    //     [new Date(2008, 1 ,2), 14045, undefined, undefined],
+    //     [new Date(2008, 1 ,3), 55022, undefined, undefined],
+    //     [new Date(2008, 1 ,4), 75284, undefined, undefined],
+    //     [new Date(2008, 1 ,5), 41476, 'Bought Pens','Bought 200k pens'],
+    //     [new Date(2008, 1 ,6), 33322, undefined, undefined]
+    //   ]);
+    //
+    //   var chart = new google.visualization.AnnotationChart(document.getElementById('timelinediv'));
+    //   chart.draw(data, {displayAnnotations: false});
+    // }
     function drawTimeLine(relevant) {
       const container = document.getElementById('timelinediv');
-      const chart = new google.visualization.AnnotationChart(container);//
+      const chart = new google.visualization.Timeline(container);
       const dataTable = new google.visualization.DataTable();
       dataTable.addColumn({type: 'string', id: 'value'});
       dataTable.addColumn({type: 'date', id: 'Start'});
@@ -252,7 +261,7 @@ export class FollowUpDashboardComponent implements AfterViewInit, OnInit {
         avoidOverlappingGridLines: true,
         tooltip: {isHtml: true}
       };
-      chart.draw(dataTable, {displayAnnotations: true});//
+      chart.draw(dataTable, options);
     }
   }
   ngAfterViewInit() {

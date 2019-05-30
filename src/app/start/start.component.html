@@ -1,23 +1,23 @@
 <div style="margin-top: 100px" class="row well col-lg-offset-2 col-md-offset-1 col-lg-8 col-md-10">
   <div class="col-sm-12 col-lg-12 col-md-12">
-    <div class="col-sm-2 col-md-1 col-lg-2">
-      <mat-form-field>
-        <mat-select [(ngModel)]='selectedBase' style="margin-top: 22px; " placeholder="Data based:">
+    <div class="col-sm-2 col-md-2 col-lg-2">
+      <mat-form-field style="width: 80%;">
+        <mat-select [(ngModel)]='selectedBase' style=" margin-top: 22px" placeholder="Data based:"><!--22-->
           <mat-option value="1">time base</mat-option>
           <mat-option value="2">patient base</mat-option>
         </mat-select>
       </mat-form-field>
     </div>
-    <div class="col-sm-3 col-md-2 col-lg-3">
-      <p class="input-group" style="margin-top: 35px;">
+    <div class="col-sm-3 col-md-3 col-lg-3">
+      <p class="input-group" style="margin-top: 15px">
         <label style="margin-right: 10px">
           Start Date: </label>
         <input [(ngModel)]="fromDate" [owlDateTimeTrigger]="dt" [owlDateTime]="dt">
         <owl-date-time #dt></owl-date-time>
       </p>
     </div>
-    <div class="col-sm-3 col-md-2 col-lg-3">
-      <p class="input-group" style="margin-top: 35px;">
+    <div class="col-sm-3 col-md-3 col-lg-3">
+      <p class="input-group" style="margin-top: 15px"><!--35-->
         <label style="margin-right: 10px">
           End Date: </label>
         <input [(ngModel)]="toDate" [owlDateTimeTrigger]="dt1" [owlDateTime]="dt1">
@@ -34,7 +34,7 @@
     <!-- </div> -->
     <!-- <div class="col-lg-12 col-md-12"> -->
     <div class="col-sm-2 col-md-2 col-lg-2">
-      <p class="input-group" style="width:20px;margin-top: 5px;">
+      <p class="input-group" style="width:20px;margin-top: 8px;">
         <label>Patients:</label>
         <ss-multiselect-dropdown style="display: block; " [options]="myOptions" [(ngModel)]="optionsModel"  [settings]="multiSelectSettings"></ss-multiselect-dropdown>
       </p>

@@ -42,8 +42,8 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit {
               private sharedR: SharedRequestService, private objToChart: ObjectToChartService, private loadingScreenService: LoadingScreenService) {
     this.mainRequest = this.sharedR.request.value;
     this.mainRequest.stage = 'admission';
-    // followUpAndPrevention, followUpAndPreventionAndTreatment
     if (localStorage.getItem('admission') !== null) {
+      this.loadingScreenService.stopLoading()
       if(localStorage.getItem('admission') == 'no data'){
         this.pageError = true;
       } else {
@@ -53,7 +53,7 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit {
         // create pie chart
         this.admissionCompliance = this.objToChart.createPieChart(this.mainPlan.score);
         // create bar chart
-        this.createBar(this.mainPlan.subPlans);
+         this.createBar(this.mainPlan.subPlans);
       }
     } else {
       this.basesrv.getCompliance(this.mainRequest, this.callback.bind(this));
@@ -131,7 +131,7 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit {
   }
 
   callback(data){
-    this.loadingScreenService.stopLoading()
+    this.loadingScreenService.stopLoading();
     this.mainPlan = this.xmltosrv.prepareXMLofCompliance(data);
     if(this.mainPlan.score == -1) {
       localStorage.setItem('admission', 'no dada');

@@ -52,7 +52,7 @@ export class StartComponent implements OnInit {
   }
   Submit() {
 
-    this.loadingScreenService.loading = true;
+    // this.loadingScreenService.loading = true;
     localStorage.clear();
     const request = new DataRequest();
     if (this.selectedBase === '1') {
