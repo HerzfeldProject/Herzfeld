@@ -26,25 +26,25 @@ export class BandagingDashboardComponent implements OnInit, AfterViewInit {
   public showIntervals = false;
   public colorsCompliance = [ {backgroundColor: ['#01b300', '#ed1d04']}];
   public colorsConcepts = [ {backgroundColor: ['#87cf78', '#87cf78', '#87cf78', '#87cf78', '#87cf78', '#87cf78', '#87cf78', '#87cf78', '#87cf78']}];
-  public prevCompliance: PieChartData;
-  public prevConcepts: BarChartData;
+  public bandCompliance: PieChartData;
+  public bandConcepts: BarChartData;
 
   constructor(private admDashService: AdmissionDashboardService, public basesrv: BaseServiceService,   private route: ActivatedRoute,
               private router: Router, private xmltosrv: XmlToObjectService,
               private sharedR: SharedRequestService, private objToChart: ObjectToChartService) {
     this.mainRequest = this.sharedR.request.value;
-    this.mainRequest.stage = 'bandaging';
+    this.mainRequest.stage = 'Bandage';
     // followUpAndPrevention, followUpAndPreventionAndTreatment
-    if(localStorage.getItem('bandaging') !== null ) {
-      if(localStorage.getItem('bandaging') == 'no data'){
+    if(localStorage.getItem('Bandage') !== null ) {
+      if(localStorage.getItem('Bandage') == 'no data'){
         this.pageError = true;
       } else {
-        this.mainPlan = JSON.parse(localStorage.getItem('bandaging'));
+        this.mainPlan = JSON.parse(localStorage.getItem('Bandage'));
         this.checked = false;
         // create pie chart
-        this.prevCompliance = this.objToChart.createPieChart(this.mainPlan.score);
+        this.bandCompliance = this.objToChart.createPieChart(this.mainPlan.score);
         // create bar chart
-        this.prevConcepts = this.objToChart.createBarChart(this.mainPlan.subPlans, this.mainRequest);
+        this.bandConcepts = this.objToChart.createBarChart(this.mainPlan.subPlans, this.mainRequest);
       }
 
     } else {
@@ -57,9 +57,9 @@ export class BandagingDashboardComponent implements OnInit, AfterViewInit {
           localStorage.setItem('bandaging', JSON.stringify(this.mainPlan));
           this.checked = false;
           // create pie chart
-          this.prevCompliance = this.objToChart.createPieChart(this.mainPlan.score);
+          this.bandCompliance = this.objToChart.createPieChart(this.mainPlan.score);
           // create bar chart
-          this.prevConcepts = this.objToChart.createBarChart(this.mainPlan.subPlans, this.mainRequest);
+          this.bandConcepts = this.objToChart.createBarChart(this.mainPlan.subPlans, this.mainRequest);
         }
       });
     }

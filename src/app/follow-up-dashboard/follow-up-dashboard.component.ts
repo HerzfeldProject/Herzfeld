@@ -39,30 +39,30 @@ export class FollowUpDashboardComponent implements AfterViewInit, OnInit {
   constructor(private breakpointObserver: BreakpointObserver, private sharedR: SharedRequestService,
               private loadscreenService: LoadingScreenService, private basesrv: BaseServiceService, private xmltosrv: XmlToObjectService, private objToChart: ObjectToChartService) {
     this.mainRequest = this.sharedR.request.value;
-    this.mainRequest.stage = 'followUp';
-    if (localStorage.getItem('followUp') !== null) {
-      if (localStorage.getItem('followUp') === 'no  data') {
-        this.pageError = true;
-      } else {
-        this.mainPlan = JSON.parse(localStorage.getItem('followUp'));
-        console.log(this.mainPlan);
-        this.checked = false;
-        // create pie chart
-        this.followUpCompliance = this.objToChart.createPieChart(this.mainPlan.score);
-        // create bar chart
-        this.createBar(this.mainPlan.subPlans);
-        // this.followUpConcepts = this.objToChart.createBarChart(this.mainPlan.subPlans, this.mainRequest);
-      }
-    } else {
+    this.mainRequest.stage = 'Followup';
+    // if (localStorage.getItem('Followup') !== null) {
+    //   if (localStorage.getItem('Followup') === 'no  data') {
+    //     this.pageError = true;
+    //   } else {
+    //     this.mainPlan = JSON.parse(localStorage.getItem('Followup'));
+    //     console.log(this.mainPlan);
+    //     this.checked = false;
+    //     // create pie chart
+    //     this.followUpCompliance = this.objToChart.createPieChart(this.mainPlan.score);
+    //     // create bar chart
+    //     this.createBar(this.mainPlan.subPlans);
+    //     // this.followUpConcepts = this.objToChart.createBarChart(this.mainPlan.subPlans, this.mainRequest);
+    //   }
+    // } else {
       this.loadscreenService.startLoading();
       this.basesrv.getCompliance(this.mainRequest, data => {
         this.loadscreenService.stopLoading();
         this.mainPlan = this.xmltosrv.prepareXMLofCompliance(data);
         if (this.mainPlan.score == -1) {
           this.pageError = true;
-          localStorage.setItem('followUp', 'no data');
+          localStorage.setItem('Followup', 'no data');
         } else {
-          localStorage.setItem('followUp', JSON.stringify(this.mainPlan));
+          localStorage.setItem('Followup', JSON.stringify(this.mainPlan));
           console.log(this.mainPlan);
           this.checked = false;
           // create pie chart
@@ -72,11 +72,12 @@ export class FollowUpDashboardComponent implements AfterViewInit, OnInit {
           // this.followUpConcepts = this.objToChart.createBarChart(this.mainPlan.subPlans, this.mainRequest);
         }
       });
-    }
+    // }
   }
   createBar(subPlans) {
-    const father = document.getElementById('barDiv');
-    father.innerHTML = '';
+    const father = document.getElementById('barDivFollowup');
+    if(father !== null){
+    father.innerHTML = '';}
     const canvas = <HTMLCanvasElement>document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     this.tempSubPlans = subPlans;

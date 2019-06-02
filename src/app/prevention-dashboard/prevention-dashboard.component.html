@@ -41,6 +41,7 @@
     </mat-grid-tile>
     <mat-grid-tile rowHeight="fit">
       <mat-card class="dashboard-card">
+        <i (click)="onDrillUp()" title="Go Back" style="cursor: pointer; float: right;margin-right: 0; font-size: 35px" *ngIf="levelOfDrillDown>0" class="fa fa-arrow-circle-left"></i>
         <mat-card-header>
           <mat-card-title>
             <h5 style="font-size: 20px; color: #0071c5">Detailed Admission Scores:
@@ -50,8 +51,6 @@
           </mat-card-title>
         </mat-card-header>
         <mat-card-content class="dashboard-card-content">
-          <i (click)="onDrillUp()" title="Go Back" style="cursor: pointer; float: right;margin-right: 0; font-size: 35px" *ngIf="levelOfDrillDown>0" class="fa fa-arrow-circle-left"></i>
-
           <div id="barDiv" style="display: block">
           </div>
         </mat-card-content>

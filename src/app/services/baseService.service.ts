@@ -47,6 +47,24 @@ export class BaseServiceService implements OnInit {
           const result = parser.parseFromString(xmlreq.responseXML.getElementsByTagName
           ('GetComplianceResult')[0].childNodes[0].textContent, 'text/xml');
           callback.apply(this, [result]);
+        } else {
+          xmlreq.open('POST', 'http://medinfo2.ise.bgu.ac.il/MediatorNewTAK/complianceAPI/complianceAPI.svc', true);
+          xmlreq.setRequestHeader('Content-Type', 'text/xml;charset=utf-8');
+          xmlreq.responseType = 'document';
+          xmlreq.setRequestHeader('SOAPAction', 'http://tempuri.org/IComplianceAPI/GetCompliance');
+          xmlreq.onreadystatechange = function () {
+            if (xmlreq.readyState === 4) {
+              if (xmlreq.status === 200 ) {
+                const parser = new DOMParser();
+                console.log(xmlreq.responseXML);
+                const result = parser.parseFromString(xmlreq.responseXML.getElementsByTagName
+                ('GetComplianceResult')[0].childNodes[0].textContent, 'text/xml');
+                callback.apply(this, [result]);
+              }
+            }
+          };
+          // xmlreq.timeout = 4000; // Set timeout to 4 seconds (4000 milliseconds)
+          xmlreq.send(message2);
         }
       }
     };
@@ -72,6 +90,20 @@ export class BaseServiceService implements OnInit {
           const result = xmlreq.responseXML.getElementsByTagName
           ('GetSubPlansResult')[0].childNodes;
           callback.apply(this, [result]);
+        } else {
+          xmlreq.open('POST', 'http://medinfo2.ise.bgu.ac.il/MediatorNewTAK/complianceAPI/complianceAPI.svc', true);
+          xmlreq.setRequestHeader('Content-Type', 'text/xml;charset=utf-8');
+          xmlreq.responseType = 'document';
+          xmlreq.setRequestHeader('SOAPAction', 'http://tempuri.org/IComplianceAPI/GetSubPlans');
+          xmlreq.onreadystatechange = function () {
+            if (xmlreq.readyState === 4) {
+              if (xmlreq.status === 200) {
+                const result = xmlreq.responseXML.getElementsByTagName
+                ('GetSubPlansResult')[0].childNodes;
+                callback.apply(this, [result]);
+              }}};
+          xmlreq.send(message);
+          console.log(`status: ${xmlreq.status}, status text: ${xmlreq.statusText}`);
         }
       }
     };
@@ -98,6 +130,23 @@ export class BaseServiceService implements OnInit {
         console.log(result);
         callback.apply(this, [result]);
         // xmlreq.abort();
+      }  else {
+        xmlreq.open('POST', 'http://medinfo2.ise.bgu.ac.il/MediatorNewTAK/AdministrationAPI/AdministrationAPI.svc', true);
+        xmlreq.setRequestHeader('Content-Type', 'text/xml;charset=utf-8');
+        xmlreq.responseType = 'document';
+        xmlreq.setRequestHeader('SOAPAction', 'http://tempuri.org/IAdministrationService/GetPatients');
+        xmlreq.onreadystatechange = function () {
+          if (xmlreq.readyState === 4) {
+            if (xmlreq.status === 200) {
+              const result = xmlreq.responseXML.getElementsByTagName
+              ('GetPatientsResult')[0].childNodes;
+              console.log(result);
+              callback.apply(this, [result]);
+              // xmlreq.abort();
+            }
+          }
+        };
+        xmlreq.send(message);
       }
     }
   };
@@ -126,6 +175,23 @@ export class BaseServiceService implements OnInit {
           ('GetKnowledgeResult')[0].childNodes[0].textContent, 'text/xml');
           callback.apply(this, [result]);
           // xmlreq.abort();
+        } else {
+          xmlreq.open('POST', 'http://medinfo2.ise.bgu.ac.il/MediatorNewTAK/complianceAPI/complianceAPI.svc', true);
+          xmlreq.setRequestHeader('Content-Type', 'text/xml;charset=utf-8');
+          xmlreq.responseType = 'document';
+          xmlreq.setRequestHeader('SOAPAction', 'http://tempuri.org/IComplianceAPI/GetKnowledge');
+          xmlreq.onreadystatechange = function () {
+            if (xmlreq.readyState === 4) {
+              if (xmlreq.status === 200) {
+                const parser = new DOMParser();
+                result = parser.parseFromString(xmlreq.responseXML.getElementsByTagName
+                ('GetKnowledgeResult')[0].childNodes[0].textContent, 'text/xml');
+                callback.apply(this, [result]);
+                // xmlreq.abort();
+              }
+            }
+          };
+          xmlreq.send(message);
         }
       }
     };
@@ -158,13 +224,26 @@ export class BaseServiceService implements OnInit {
         if (xmlreq.status === 200) {
           callback.apply(this, [xmlreq.responseXML.getElementsByTagName('GetDataResult')[0].childNodes]);
           // xmlreq.abort();
+        } else {
+          xmlreq.open('POST', 'http://medinfo2.ise.bgu.ac.il/MediatorNewTAK/queryDrivenAPI/queryDrivenAPI.svc', true);
+          xmlreq.setRequestHeader('Content-Type', 'text/xml;charset=utf-8');
+          xmlreq.responseType = 'document';
+          xmlreq.setRequestHeader('SOAPAction', 'http://tempuri.org/IQueryDrivenAPI/GetData');
+          xmlreq.onreadystatechange = function () {
+            if (xmlreq.readyState === 4) {
+              if (xmlreq.status === 200) {
+                callback.apply(this, [xmlreq.responseXML.getElementsByTagName('GetDataResult')[0].childNodes]);
+                // xmlreq.abort();
+              }
+            }
+          };
+          xmlreq.send(message);
         }
       }
     };
     xmlreq.send(message);
-    //xmlreq.abort();
   }
-  public authenticate(user, callback){
+  public authenticate(user, callback) {
     const xmlreq = new XMLHttpRequest();
     xmlreq.open('POST', 'http://medinfo2.ise.bgu.ac.il/MediatorNewTAK/AdministrationAPI/AdministrationAPI.svc', true);
     xmlreq.setRequestHeader('Content-Type', 'text/xml;charset=utf-8');
@@ -179,23 +258,28 @@ export class BaseServiceService implements OnInit {
       '</s:Body>' +
       '</s:Envelope>';
     xmlreq.setRequestHeader('SOAPAction', 'http://tempuri.org/IAdministrationService/Authenticate');
-
     xmlreq.onreadystatechange = function () {
-      if (xmlreq.readyState === 4 && xmlreq.status === 200 ) {
+      if (xmlreq.readyState === 4) {
+        if(xmlreq.status === 200){
         // const result = xmlreq.responseXML.getElementsByTagName('AuthenticateResult')[0].innerHTML;
         callback.apply(this, [xmlreq.responseXML]);
         // xmlreq.abort();
+      } else {
+        xmlreq.open('POST', 'http://medinfo2.ise.bgu.ac.il/MediatorNewTAK/AdministrationAPI/AdministrationAPI.svc', true);
+        xmlreq.setRequestHeader('Content-Type', 'text/xml;charset=utf-8');
+        xmlreq.responseType = 'document';
+        xmlreq.setRequestHeader('SOAPAction', 'http://tempuri.org/IAdministrationService/Authenticate');
+        xmlreq.onreadystatechange = function () {
+          if (xmlreq.readyState === 4 && xmlreq.status === 200) {
+            // const result = xmlreq.responseXML.getElementsByTagName('AuthenticateResult')[0].innerHTML;
+            callback.apply(this, [xmlreq.responseXML]);
+            // xmlreq.abort();
+          }
+        };
+        xmlreq.send(message);
       }
-      // else if (xmlreq.readyState === 4 && xmlreq.status === 0) {
-      //   callback.apply(this, [null]);
-      // }
+    }
     };
-    // xmlreq.onreadystatechange = function () {
-    //   if (xmlreq.readyState === 4 && xmlreq.status === 200 ) {
-    //       const result = xmlreq.responseXML.getElementsByTagName('AuthenticateResult')[0].innerHTML;
-    //       callback.apply(this, [result]);
-    //     }
-    // };
     // xmlreq.timeout = 4000; // Set timeout to 4 seconds (4000 milliseconds)
     // xmlreq.ontimeout = function () { alert("Timed out!!!"); }
     xmlreq.send(message);

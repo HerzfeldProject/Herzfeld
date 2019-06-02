@@ -19,6 +19,7 @@ import {Chart} from 'chart.js';
 })
 export class PreventionDashboardComponent implements OnInit, AfterViewInit{
 
+  public endDrill = false;
   public detailText = '';
   public tempSubPlans = [];
   public levels = [];
@@ -39,29 +40,29 @@ export class PreventionDashboardComponent implements OnInit, AfterViewInit{
   private router: Router, private xmltosrv: XmlToObjectService,
   private sharedR: SharedRequestService, private objToChart: ObjectToChartService) {
     this.mainRequest = this.sharedR.request.value;
-    this.mainRequest.stage = 'followUpAndPrevention';
+    this.mainRequest.stage = 'Followup and Prevention';
     // followUpAndPrevention, followUpAndPreventionAndTreatment
-    if(localStorage.getItem('followUpAndPrevention') !== null ) {
-      if(localStorage.getItem('followUpAndPrevention') == 'no data'){
-        this.pageError = true;
-      } else {
-        this.mainPlan = JSON.parse(localStorage.getItem('followUpAndPrevention'));
-        this.checked = false;
-        // create pie chart
-        this.prevCompliance = this.objToChart.createPieChart(this.mainPlan.score);
-        // create bar chart
-        // this.prevConcepts = this.objToChart.createBarChart(this.mainPlan.subPlans, this.mainRequest);
-        this.createBar(this.mainPlan.subPlans);
-      }
-
-    } else {
+    // if(localStorage.getItem('Followup and Prevention') !== null ) {
+    //   if(localStorage.getItem('Followup and Prevention') == 'no data'){
+    //     this.pageError = true;
+    //   } else {
+    //     this.mainPlan = JSON.parse(localStorage.getItem('Followup and Prevention'));
+    //     this.checked = false;
+    //     // create pie chart
+    //     this.prevCompliance = this.objToChart.createPieChart(this.mainPlan.score);
+    //     // create bar chart
+    //     // this.prevConcepts = this.objToChart.createBarChart(this.mainPlan.subPlans, this.mainRequest);
+    //     this.createBar(this.mainPlan.subPlans);
+    //   }
+    //
+    // } else {
       this.basesrv.getCompliance(this.mainRequest, data => {
         this.mainPlan = this.xmltosrv.prepareXMLofCompliance(data);
         if(this.mainPlan.score == -1) {
           this.pageError = true;
-          localStorage.setItem('followUpAndPrevention', 'no data');
+          localStorage.setItem('Followup and Prevention', 'no data');
         } else {
-          localStorage.setItem('followUpAndPrevention', JSON.stringify(this.mainPlan));
+          localStorage.setItem('Followup and Prevention', JSON.stringify(this.mainPlan));
           this.checked = false;
           // create pie chart
           this.prevCompliance = this.objToChart.createPieChart(this.mainPlan.score);
@@ -69,7 +70,7 @@ export class PreventionDashboardComponent implements OnInit, AfterViewInit{
           this.createBar(this.mainPlan.subPlans);
         }
       });
-    }
+    // }
     console.log(this.mainPlan);
 
 
@@ -140,23 +141,30 @@ export class PreventionDashboardComponent implements OnInit, AfterViewInit{
 
   }
   onDrillDown(c, i) {
+    if (this.endDrill) {
+      const lastArrow = this.detailText.lastIndexOf('<i class="fa fa-arrow-right"></i>');
+      const oneBefore = this.detailText.substring(0, lastArrow).lastIndexOf('<i class="fa fa-arrow-right"></i>');
+      this.detailText = this.detailText.substring(0, oneBefore + 33);
+    }
     this.levels.push(this.tempSubPlans);
-    if(this.levelOfDrillDown == 0){
+    if (this.levelOfDrillDown == 0) {
       this.detailText = '';
     }
     this.levelOfDrillDown ++;
     const conceptName = i[0]._model.label;
     let sub = [];
     let textToAdd = '';
-    for(let i = 0; i < this.tempSubPlans.length; i++){
-      if(this.tempSubPlans[i].name == conceptName){
+    for (let i = 0; i < this.tempSubPlans.length; i++) {
+      if (this.tempSubPlans[i].name == conceptName) {
         textToAdd = conceptName ;
         sub = this.tempSubPlans[i].subPlans;
-        if(this.tempSubPlans[i].score !== undefined){
-          textToAdd = textToAdd + ' - '+ Number(this.tempSubPlans[i].score).toFixed(2);
+        if (this.tempSubPlans[i].score !== undefined) {
+          this.endDrill = false;
+          textToAdd = textToAdd + ' - ' + Number(this.tempSubPlans[i].score).toFixed(2);
         }
-        if(this.tempSubPlans[i].conceptId !== undefined){
-          textToAdd = '<button title="Show Time Intervals" (click)="' + this.onConceptInterval( conceptName , this.tempSubPlans[i].conceptId) + '">' + textToAdd + '</button>';
+        if (this.tempSubPlans[i].conceptId !== undefined) {
+          textToAdd = '<button title="Show Time Intervals" (click)="' +
+            this.onConceptInterval( conceptName , this.tempSubPlans[i].conceptId) + '">' + textToAdd + '</button>';
         }
         textToAdd = textToAdd + '<i class="fa fa-arrow-right"></i> ';
         this.detailText = this.detailText + textToAdd;
@@ -164,19 +172,22 @@ export class PreventionDashboardComponent implements OnInit, AfterViewInit{
       }
     }
     document.getElementById('moreDetails').innerHTML = this.detailText;
-    this.createBar(sub);
+    if (sub[0].score !== undefined) {
+      this.createBar(sub);
+    } else {      this.endDrill = true;
+    }
   }
   onDrillUp(){
     this.levelOfDrillDown --;
-    if(this.levelOfDrillDown == 0){
+    if (this.levelOfDrillDown === 0) {
       this.detailText = '';
-    } else if(this.levelOfDrillDown == 1) {
-      const oneBefore = this.detailText.lastIndexOf('<i class="fa fa-arrow-right"></i> ');
-      this.detailText = this.detailText.substring(0, oneBefore + 3);
-    }else{
-      const lastArrow = this.detailText.lastIndexOf('<i class="fa fa-arrow-right"></i> ');
-      const oneBefore = this.detailText.substring(0, lastArrow).lastIndexOf('<i class="fa fa-arrow-right"></i> ');
-      this.detailText = this.detailText.substring(0, oneBefore + 3);
+      // } else if (this.levelOfDrillDown === 1) {
+      //   const oneBefore = this.detailText.lastIndexOf('<i class="fa fa-arrow-right"></i>');
+      //   this.detailText = this.detailText.substring(0, oneBefore + 33);
+    }    else {
+      const lastArrow = this.detailText.lastIndexOf('<i class="fa fa-arrow-right"></i>');
+      const oneBefore = this.detailText.substring(0, lastArrow).lastIndexOf('<i class="fa fa-arrow-right"></i>');
+      this.detailText = this.detailText.substring(0, oneBefore + 33);
     }
     document.getElementById('moreDetails').innerHTML = this.detailText;
     this.createBar(this.levels.pop());
@@ -195,12 +206,13 @@ export class PreventionDashboardComponent implements OnInit, AfterViewInit{
       const temp = this.xmltosrv.prepareXMLofDATA(data);
       const relevant = this.xmltosrv.createDataInstances(temp, this.mainRequest.startDate, this.mainRequest.endDate);
 
-      if(relevant.length == 0){
-        let empty = document.createElement('h2');
+      if (relevant.length === 0) {
+        const empty = document.createElement('h2');
         empty.textContent = 'no data for ' + name;
         document.getElementById('timelinediv').appendChild(empty);
 
       } else {
+        ////////////////////////
         // calculateIntervalesForAllPatients
         google.charts.load('current', {'packages': ['corechart', 'timeline']});
         google.charts.setOnLoadCallback(drawTimeLine.bind(relevant));
@@ -208,14 +220,32 @@ export class PreventionDashboardComponent implements OnInit, AfterViewInit{
         const titleOfIntervales = document.createElement('h5');
         titleOfIntervales.style.color = '#0071c5';
         titleOfIntervales.style.fontSize = '20px';
-        let text = name + ' Compliance of Patients: '+ this.mainRequest.patientsList+'<br><br>';
-        text = text + 'Start date: ' + this.mainRequest.startDate.toDateString() +'<br><br>';
-        text = text + 'End date:' + this.mainRequest.endDate.toDateString() +'<br><br>';
+        let text = name + ' Compliance of Patients: ' + this.mainRequest.patientsList + '<br><br>';
+        text = text + 'Start date: ' + this.mainRequest.startDate.toDateString() + '<br><br>';
+        text = text + 'End date:' + this.mainRequest.endDate.toDateString() +  '<br><br>';
         titleOfIntervales.innerHTML = text;
         document.getElementById('intervalsPatients').appendChild(titleOfIntervales);
         document.getElementById('intervalesDashboard').focus();
       }
     });
+    // function drawChart() {
+    //   var data = new google.visualization.DataTable();
+    //   data.addColumn('date', 'Date');
+    //   data.addColumn('number', 'Sold Pencils');
+    //   data.addColumn('string', 'title1');
+    //   data.addColumn('string', 'text1');
+    //   data.addRows([
+    //     [new Date(2008, 1 ,1), 30000, undefined, undefined],
+    //     [new Date(2008, 1 ,2), 14045, undefined, undefined],
+    //     [new Date(2008, 1 ,3), 55022, undefined, undefined],
+    //     [new Date(2008, 1 ,4), 75284, undefined, undefined],
+    //     [new Date(2008, 1 ,5), 41476, 'Bought Pens','Bought 200k pens'],
+    //     [new Date(2008, 1 ,6), 33322, undefined, undefined]
+    //   ]);
+    //
+    //   var chart = new google.visualization.AnnotationChart(document.getElementById('timelinediv'));
+    //   chart.draw(data, {displayAnnotations: false});
+    // }
     function drawTimeLine(relevant) {
       const container = document.getElementById('timelinediv');
       const chart = new google.visualization.Timeline(container);

@@ -40,17 +40,16 @@
       </mat-grid-tile>
       <mat-grid-tile rowHeight="fit">
             <mat-card class="dashboard-card">
-                <mat-card-header>
+              <i (click)="onDrillUp()" matTooltip="Go Previous" style="cursor: pointer; float: right;margin-right: 0; font-size: 20px" *ngIf="levelOfDrillDown>0" class="fa fa-arrow-circle-left"></i>
+              <mat-card-header>
                     <mat-card-title>
                       <h5 style="font-size: 20px; color: #0071c5">Detailed Admission Scores:
                       </h5>
-                      <h6 style="font-size: 15px;" id="moreDetails" *ngIf="levelOfDrillDown>0">
-                        {{detailText}}
+                      <h6 style="font-size: 15px;" id="moreDetails">
                       </h6>
                     </mat-card-title>
                 </mat-card-header>
                 <mat-card-content class="dashboard-card-content">
-                  <i (click)="onDrillUp()" matTooltip="Go Previous" style="cursor: pointer; float: right;margin-right: 0; font-size: 20px" *ngIf="levelOfDrillDown>0" class="fa fa-arrow-circle-left"></i>
 
                   <div id="barDiv" style="display: block">
              </div>
