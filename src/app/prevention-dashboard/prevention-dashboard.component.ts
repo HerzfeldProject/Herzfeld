@@ -107,7 +107,7 @@ export class PreventionDashboardComponent implements OnInit, AfterViewInit{
     this.tempSubPlans = subPlans;
     this.prevConcepts = new BarChartData();
     this.prevConcepts.datasets = [{data: [], label: 'Completion percentages', metadata: [],
-      backgroundColor: ['#87cf78', '#87cf78', '#87cf78', '#87cf78', '#87cf78', '#87cf78', '#87cf78', '#87cf78', '#87cf78']}];
+      backgroundColor: ['#87cf78', '#87cf78', '#87cf78', '#87cf78', '#87cf78', '#87cf78', '#87cf78', '#87cf78', '#87cf78', '#87cf78', '#87cf78','#87cf78','#87cf78','#87cf78']}];
     this.prevConcepts.labels = [];
     for (let i = 0; i < subPlans.length; i++) {
       this.prevConcepts.labels.push(subPlans[i].name);

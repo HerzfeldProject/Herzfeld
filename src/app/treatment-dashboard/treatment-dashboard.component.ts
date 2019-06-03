@@ -66,7 +66,7 @@ export class TreatmentDashboardComponent implements OnInit, AfterViewInit{
           // create pie chart
           this.treatCompliance = this.objToChart.createPieChart(this.mainPlan.score);
           // create bar chart
-          this.treatConcepts = this.objToChart.createBarChart(this.mainPlan.subPlans, this.mainRequest);
+          this.createBar(this.mainPlan.subPlans);
         }
       });
     //}
@@ -101,7 +101,7 @@ export class TreatmentDashboardComponent implements OnInit, AfterViewInit{
   }
   ngOnInit() {  }
   createBar(subPlans) {
-    const father = document.getElementById('barDivFollowup');
+    const father = document.getElementById('barDiv');
     if(father !== null){
       father.innerHTML = '';}
     const canvas = <HTMLCanvasElement>document.createElement('canvas');
@@ -109,7 +109,7 @@ export class TreatmentDashboardComponent implements OnInit, AfterViewInit{
     this.tempSubPlans = subPlans;
     this.treatConcepts = new BarChartData();
     this.treatConcepts.datasets = [{data: [], label: 'Completion percentages', metadata: [],
-      backgroundColor: ['#d1a4c6', '#d1a4c6', '#d1a4c6', '#d1a4c6', '#d1a4c6', '#d1a4c6']}];
+      backgroundColor: ['#d3a93e', '#d3a93e', '#d3a93e', '#d3a93e', '#d3a93e', '#d3a93e', '#d3a93e', '#d3a93e', '#d3a93e','#d3a93e','#d3a93e','#d3a93e','#d3a93e']}];
     this.treatConcepts.labels = [];
     for (let i = 0; i < subPlans.length; i++) {
       this.treatConcepts.labels.push(subPlans[i].name);
