@@ -81,9 +81,16 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit {
       responsive: true,
       scaleShowVerticalLines: false,
       scales: {
+        xAxes: [{
+          ticks: {
+            autoSkip: false
+          }
+        }
+        ],
         yAxes: [{
           ticks: {
-            beginAtZero: true
+            beginAtZero: true,
+            suggestedMax: 1,
           }
         }]
       },
@@ -266,5 +273,6 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
+    this.loadingScreenService.stopLoading();
   }
 }

@@ -11,6 +11,9 @@ import {DataRequest} from '../models/dataRequest';
 import {XmlToObjectService} from '../services/xml-to-object.service';
 import {SharedRequestService} from '../services/shared-request.service';
 import {LoadingScreenService} from '../services/loading-screen.service';
+import {Router} from '@angular/router';
+import {ProtocolModalComponent} from '../protocol-modal/protocol-modal.component';
+import {MatDialog} from '@angular/material';
 // import {DataInstance} from '../models/dataInstance';
 // import {Plan} from '../models/plan';
 // import {parser} from 'xml2json';
@@ -41,18 +44,32 @@ export class StartComponent implements OnInit {
     from: false,
     to: false
   };
-  constructor(private valService: BaseServiceService, private _http: HttpClient, private basesrv: BaseServiceService, private xmltosrv: XmlToObjectService, private sharedR: SharedRequestService,private loadingScreenService: LoadingScreenService) {
+  constructor(private valService: BaseServiceService,    private router: Router,
+              private _http: HttpClient, private dialog: MatDialog,  private basesrv: BaseServiceService, private xmltosrv: XmlToObjectService, private sharedR: SharedRequestService, private loadingScreenService: LoadingScreenService) {
   }
   ngOnInit() {
     this.toDate = new Date();
-    this.fromDate = new Date();
+    this.fromDate = new Date(2016, 1, 1);
     this.basesrv.getPatients(data => {
       this.myOptions = this.xmltosrv.prepareXMLofPatients(data);
     });
   }
-  Submit() {
+  openDialog(): void {
+    const dialogRef = this.dialog.open(ProtocolModalComponent, {
+      width: '70%',
+      height: '70%',
+      data: {name: 'l', animal: 'ttt'}
+    });
 
-    // this.loadingScreenService.loading = true;
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+    });
+  }
+  Submit() {
+    // this.router.navigate(['nav']);
+    this.loadingScreenService.startLoading();
+    this.router.navigate(['nav/admission']);
+    this.loadingScreenService.stopLoading();
     localStorage.clear();
     const request = new DataRequest();
     if (this.selectedBase === '1') {
@@ -67,6 +84,8 @@ export class StartComponent implements OnInit {
     this.mainRequest = request;
     this.sharedR.changeRequest(request);
     this.serched = false;
+
+
     // send the request to the other pages
     // this.basesrv.getCompliance(request, data => {
     //   const plan = this.xmltosrv.prepareXMLofCompliance(data);

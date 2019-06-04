@@ -118,9 +118,16 @@ export class PreventionDashboardComponent implements OnInit, AfterViewInit{
       responsive: true,
       scaleShowVerticalLines: false,
       scales: {
+        xAxes: [{
+          ticks: {
+            autoSkip: false
+          }
+        }
+        ],
         yAxes: [{
           ticks: {
-            beginAtZero: true
+            beginAtZero: true,
+            suggestedMax: 1,
           }
         }]
       },

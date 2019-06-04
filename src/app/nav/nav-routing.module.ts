@@ -14,7 +14,7 @@ const routes: Routes = [
     path: 'nav',
     component: StartComponent,
     children: [
-      {path: '', component: AdmissionDashboardComponent},
+      {path: '', component: NavComponent},
       {path: 'admission', component: AdmissionDashboardComponent},
       {path: 'followup' , component: FollowUpDashboardComponent},
       {path: 'prevention', component: PreventionDashboardComponent},

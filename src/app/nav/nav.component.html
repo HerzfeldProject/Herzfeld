@@ -1,6 +1,7 @@
 
 <!--<app-loading-screen></app-loading-screen>-->
 <mat-sidenav-container class="sidenav-container">
+
     <mat-sidenav #drawer class="sidenav" fixedInViewport="false" [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'" [mode]="(isHandset$ | async) ? 'over' : 'side'" [opened]="!(isHandset$ | async)">
         <mat-toolbar color="red">Menu</mat-toolbar>
         <mat-nav-list>
@@ -10,7 +11,7 @@
             <a mat-list-item href="" [routerLink]="['prevention']" [queryParams]="{title: mainRequest, si: true}">Prevention</a>
             <a mat-list-item href="" [routerLink]="['treatment']" [queryParams]="{title: mainRequest, si: true}">Treatment</a>
             <!--<a mat-list-item href="" [routerLink]="['bandaging']" [queryParams]="{title: mainRequest, si: true}">Bandaging</a>-->
-          <a mat-list-item href="" > <i style="size: 25px" class="fa fa-notes-medical"></i></a> <!-- (click)="firstModal.open(); $event.stopPropagation()"-->
+          <!--<a mat-list-item href="" > <i style="size: 25px" class="fa fa-notes-medical"></i></a> &lt;!&ndash; (click)="firstModal.open(); $event.stopPropagation()"&ndash;&gt;-->
 
         </mat-nav-list>
     </mat-sidenav>

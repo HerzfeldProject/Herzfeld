@@ -7,6 +7,7 @@ import {MatDialog} from '@angular/material';
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {LoadingScreenService} from '../services/loading-screen.service';
+import {ProtocolModalComponent} from '../protocol-modal/protocol-modal.component';
 
 @Component({
   selector: 'app-nav',
@@ -22,10 +23,12 @@ export class NavComponent implements OnInit {
     .pipe(
       map(result => result.matches)
     );
-  constructor(private breakpointObserver: BreakpointObserver, public dialog: MatDialog, private loadinScreenService: LoadingScreenService) {
+  constructor(private breakpointObserver: BreakpointObserver,
+               private loadinScreenService: LoadingScreenService, private dialog: MatDialog) {
   }
 
   ngOnInit(): void {
     console.log(this.mainRequest);
   }
   }
+

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import { map } from 'rxjs/operators';
 import { Breakpoints, BreakpointState, BreakpointObserver } from '@angular/cdk/layout';
 import {DataRequest} from '../models/dataRequest';
@@ -11,13 +11,14 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {XmlToObjectService} from '../services/xml-to-object.service';
 import {SharedRequestService} from '../services/shared-request.service';
 import {ObjectToChartService} from '../services/object-to-chart.service';
+import {LoadingScreenService} from '../services/loading-screen.service';
 
 @Component({
   selector: 'app-summary-dashboard',
   templateUrl: './summary-dashboard.component.html',
   styleUrls: ['./summary-dashboard.component.css']
 })
-export class SummaryDashboardComponent {
+export class SummaryDashboardComponent implements OnInit{
 
 
   public pageError = false;
@@ -31,10 +32,12 @@ export class SummaryDashboardComponent {
       '#d3a93e', '#d3a93e', '#d3a93e', '#d3a93e', '#d3a93e']}];
   public sumCompliance: PieChartData;
   public sumConcepts: BarChartData;
-
+  public tempPlan;
+  public tempRequest;
   constructor(private admDashService: AdmissionDashboardService, public basesrv: BaseServiceService,   private route: ActivatedRoute,
               private router: Router, private xmltosrv: XmlToObjectService,
-              private sharedR: SharedRequestService, private objToChart: ObjectToChartService) {
+              private sharedR: SharedRequestService, private objToChart: ObjectToChartService,     private loadingScreenService: LoadingScreenService) {
+    this.loadingScreenService.startLoading();
     this.mainRequest = this.sharedR.request.value;
     this.mainRequest.stage = 'Summary';
     if (localStorage.getItem('summary') !== null) {
@@ -52,8 +55,20 @@ export class SummaryDashboardComponent {
           totalscore.push({'name': this.mainPlan[k].name, 'weight': this.mainPlan[k].weight,
             'score': (JSON.parse(localStorage.getItem(this.mainPlan[k].name)).score )});
         } else {
-          // send the stage name/ the correct request
-          // this.basesrv.getCompliance(this.mainRequest, this.callback.bind(this))
+          // this.tempRequest = this.mainRequest;
+          // this.tempRequest.stage = this.mainPlan[k].name;
+          // this.basesrv.getCompliance(this.tempRequest, data1 => {
+          //   this.tempPlan = this.xmltosrv.prepareXMLofCompliance(data1);
+          //   if(this.tempPlan.score == -1) {
+          //     localStorage.setItem(this.tempPlan.name, 'no dada');
+          //     this.pageError = true;
+          //   } else {
+          //     localStorage.setItem(this.te, JSON.stringify(this.tempPlan));
+          //     this.checked = false;
+          //     totalscore.push({'name': this.tempPlan.name, 'weight': this.tempPlan.weight,
+          //       'score': (JSON.parse(localStorage.getItem(this.tempPlan.name)).score )});
+          //   }
+          // });
         }
       }
       // calc total score
@@ -91,6 +106,10 @@ export class SummaryDashboardComponent {
 
     // totalscore.push({'name': this.mainPlan[k].name, 'weight': this.mainPlan[k].weight,
     //   'score': (JSON.parse(localStorage.getItem(this.mainPlan[k].name)).score )});
+  }
+  ngOnInit(): void {
+    this.loadingScreenService.stopLoading();
+
   }
 }
 

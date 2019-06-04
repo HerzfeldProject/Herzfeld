@@ -49,6 +49,7 @@ import {Weights} from './models/weights';
 import { BandagingDashboardComponent } from './bandaging-dashboard/bandaging-dashboard.component';
 // import {ModalModule} from 'ng2-modal';
 import { LoadingScreenComponent } from './loading-screen/loading-screen.component';
+import { ProtocolModalComponent } from './protocol-modal/protocol-modal.component';
 
 // import {NgxSoapModule} from 'ngx-soap';
 // import {Proxy, BasicHttpBinding} from 'wcf.js';
@@ -66,7 +67,8 @@ import { LoadingScreenComponent } from './loading-screen/loading-screen.componen
     LoginComponent,
     StartComponent,
     BandagingDashboardComponent,
-    LoadingScreenComponent
+    LoadingScreenComponent,
+    ProtocolModalComponent
   ],
   imports: [
     AngularFireModule.initializeApp(environment.firebase),
@@ -109,6 +111,7 @@ import { LoadingScreenComponent } from './loading-screen/loading-screen.componen
     MatDialogModule, MatFormFieldModule, MatButtonModule, MatInputModule
   ],
   providers: [ Weights, Concepts],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [ProtocolModalComponent]
 })
 export class AppModule { }

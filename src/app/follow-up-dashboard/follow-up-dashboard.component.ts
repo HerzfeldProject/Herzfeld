@@ -98,10 +98,18 @@ export class FollowUpDashboardComponent implements AfterViewInit, OnInit {
       responsive: true,
       scaleShowVerticalLines: false,
       scales: {
+        xAxes: [{
+          ticks: {
+            autoSkip: false
+          }
+        }
+        ],
         yAxes: [{
           stacked: false,
           ticks: {
-            beginAtZero: true
+            beginAtZero: true,
+            suggestedMax: 1,
+
           }
         }]
       },
