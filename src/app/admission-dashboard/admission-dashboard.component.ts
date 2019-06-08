@@ -21,6 +21,8 @@ import {LoadingScreenService} from '../services/loading-screen.service';
 })
 export class AdmissionDashboardComponent implements OnInit, AfterViewInit {
 
+  selectedPlan: Plan;
+  modeTimeline = true;
   public endDrill = false;
   public detailText = '';
   public tempSubPlans = [];
@@ -134,7 +136,7 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit {
         }
         if (this.tempSubPlans[i].conceptId !== undefined) {
           textToAdd = '<button title="Show Time Intervals" (click)="' +
-            this.onConceptInterval( conceptName , this.tempSubPlans[i].conceptId) + '">' + textToAdd + '</button>';
+            this.onConceptInterval( conceptName , this.tempSubPlans[i]) + '">' + textToAdd + '</button>';
         }
         textToAdd = textToAdd + '<i class="fa fa-arrow-right"></i> ';
         this.detailText = this.detailText + textToAdd;
@@ -150,6 +152,7 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit {
   onDrillUp(){
     this.levelOfDrillDown --;
     if (this.levelOfDrillDown === 0) {
+      this.endDrill = false;
       this.detailText = '';
       // } else if (this.levelOfDrillDown === 1) {
       //   const oneBefore = this.detailText.lastIndexOf('<i class="fa fa-arrow-right"></i>');
@@ -180,23 +183,21 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit {
       // this.objToChart.createBarChart(this.mainPlan.subPlans, this.mainRequest);
     }
   }
-  onConceptInterval(name, id) {
+  onConceptInterval(name, plan) {
 
+    this.loadingScreenService.startLoading();
+    this.selectedPlan = plan;
     const child = document.getElementById('intervalsPatients');
-    const len = child.childNodes.length;
-    if (len > 0) {
-      for (let j = 0; j < len; j++) {
-        child.removeChild(child.childNodes[j]);
-      }
-    }
-    this.basesrv.getData(this.mainRequest, id, data => {
+    child.innerHTML = '';
+    this.basesrv.getData(this.mainRequest, plan.conceptId, data => {
       const temp = this.xmltosrv.prepareXMLofDATA(data);
       const relevant = this.xmltosrv.createDataInstances(temp, this.mainRequest.startDate, this.mainRequest.endDate);
 
       if (relevant.length === 0) {
+        // const data = '<h2>no data for ' + name + '</h2>'
         const empty = document.createElement('h2');
         empty.textContent = 'no data for ' + name;
-        document.getElementById('timelinediv').appendChild(empty);
+        document.getElementById('timelinediv').appendChild( data);
 
       } else {
         ////////////////////////
@@ -207,17 +208,16 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit {
         const titleOfIntervales = document.createElement('h5');
         titleOfIntervales.style.color = '#0071c5';
         titleOfIntervales.style.fontSize = '20px';
-        let text = name + ' Compliance of Patients: ' + this.mainRequest.patientsList + '<br><br>';
+        let text = name + ' Compliance <br><br>'; // of Patients: ' + this.mainRequest.patientsList + '<br><br>';
         text = text + 'Start date: ' + this.mainRequest.startDate.toDateString() + '<br><br>';
         text = text + 'End date:' + this.mainRequest.endDate.toDateString() +  '<br><br>';
         titleOfIntervales.innerHTML = text;
         document.getElementById('intervalsPatients').appendChild(titleOfIntervales);
-        document.getElementById('intervalesDashboard').focus();
       }
     });
     function drawTimeLine(relevant) {
-      const container = document.getElementById('timelinediv');
-      const chart = new google.visualization.Timeline(container);
+      // const container = document.getElementById('timelinediv');
+      const chart = new google.visualization.Timeline(document.getElementById('timelinediv'));
       const dataTable = new google.visualization.DataTable();
       dataTable.addColumn({type: 'string', id: 'value'});
       dataTable.addColumn({type: 'date', id: 'Start'});
@@ -244,6 +244,7 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit {
       };
       chart.draw(dataTable, options);
     }
+    this.loadingScreenService.stopLoading();
   }
   ngAfterViewInit() {
     Chart.pluginService.register({
@@ -271,7 +272,9 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit {
       },
     });
   }
-
+  public changeTime(isTime) {
+    this.modeTimeline = isTime;
+  }
   ngOnInit() {
     this.loadingScreenService.stopLoading();
   }

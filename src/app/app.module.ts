@@ -25,7 +25,7 @@ import {
   MatTableModule,
   MatPaginatorModule,
   MatSortModule,
-  MatInputModule
+  MatInputModule, MatExpansionModule, MatAccordion
 } from '@angular/material';
 import { AdmissionDashboardComponent } from './admission-dashboard/admission-dashboard.component';
 import { MultiselectDropdownModule } from 'angular-2-dropdown-multiselect';
@@ -95,6 +95,9 @@ import { ProtocolModalComponent } from './protocol-modal/protocol-modal.componen
     MatDialogModule,
     MatSelectModule,
     MatOptionModule,
+    MatSidenavModule,
+    MatExpansionModule,
+    // MatAccordion,
     MultiselectDropdownModule,
     ChartsModule,
     OwlDateTimeModule,
@@ -108,7 +111,7 @@ import { ProtocolModalComponent } from './protocol-modal/protocol-modal.componen
     FormsModule,
     ReactiveFormsModule,
     MatFormFieldModule,
-    MatDialogModule, MatFormFieldModule, MatButtonModule, MatInputModule
+    MatDialogModule, MatFormFieldModule, MatExpansionModule, MatAccordion, MatSidenavModule, MatButtonModule, MatInputModule
   ],
   providers: [ Weights, Concepts],
   bootstrap: [AppComponent],

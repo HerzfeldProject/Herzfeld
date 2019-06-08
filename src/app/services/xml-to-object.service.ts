@@ -48,6 +48,15 @@ export class XmlToObjectService {
     if (start.attributes.score !== undefined) {
       plan.score = start.attributes.score.nodeValue;
     }
+    if (start.attributes.patient_score_one !== undefined) {
+      plan.patientList100 = start.attributes.patient_score_one.nodeValue;
+    }
+    if (start.attributes.patient_score_zero !== undefined) {
+      plan.patientList0 = start.attributes.patient_score_zero.nodeValue;
+    }
+    if (start.attributes.patient_score_partial !== undefined) {
+      plan.patientListPart = start.attributes.patient_score_partial.nodeValue;
+    }
     plan.subPlans = [];
     if (start.children[0].nodeName.toString().toLowerCase().includes( 'plans')) {
       // go over every plan and check if 'plans' or other
@@ -78,6 +87,15 @@ export class XmlToObjectService {
     if (data.length > 0) {
       for (let i = 0; i < data.length; i++) {
         temp.push({id: data.item(i).textContent, name: data.item(i).textContent});
+      }
+    }
+    return temp;
+  }
+  prepareXMLofDepartment(data) {
+    const temp = [];
+    if (data.length > 0) {
+      for (let i = 0; i < data.length; i++) {
+        temp.push({dep: data.item(0).children[4].textContent, patients: data.item(0).children[2].textContent});
       }
     }
     return temp;

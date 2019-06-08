@@ -25,6 +25,7 @@ import {MatDialog} from '@angular/material';
 })
 export class StartComponent implements OnInit {
 
+  selectedDepartment: string;
   mainRequest: DataRequest;
   public serched = true;
   fromDate: Date;
@@ -32,6 +33,7 @@ export class StartComponent implements OnInit {
   selectedBase: string;
   optionsModel: string[];
   patients: NodeList = null;
+  department = null;
   myOptions: IMultiSelectOption[] = [];
 
   public multiSelectSettings: IMultiSelectSettings = {
@@ -52,6 +54,9 @@ export class StartComponent implements OnInit {
     this.fromDate = new Date(2016, 1, 1);
     this.basesrv.getPatients(data => {
       this.myOptions = this.xmltosrv.prepareXMLofPatients(data);
+    });
+    this.basesrv.getDepartment(data =>{
+      this.department = this.xmltosrv.prepareXMLofDepartment(data);
     });
   }
   openDialog(): void {

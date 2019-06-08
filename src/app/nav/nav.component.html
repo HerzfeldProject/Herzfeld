@@ -7,10 +7,12 @@
         <mat-nav-list>
             <a mat-list-item href="" [routerLink]="['summary']" [queryParams]="{title: mainRequest, si: true}">Summary</a>
             <a mat-list-item href="" [routerLink]="['admission']" [queryParams]="{title: mainRequest, si: true}">Admission</a>
-            <a mat-list-item href="" [routerLink]="['followup']" [queryParams]="{title: mainRequest, si: true}">Follow up</a>
-            <a mat-list-item href="" [routerLink]="['prevention']" [queryParams]="{title: mainRequest, si: true}">Prevention</a>
-            <a mat-list-item href="" [routerLink]="['treatment']" [queryParams]="{title: mainRequest, si: true}">Treatment</a>
-            <!--<a mat-list-item href="" [routerLink]="['bandaging']" [queryParams]="{title: mainRequest, si: true}">Bandaging</a>-->
+            <a mat-list-item href="" [routerLink]="['followup']" [queryParams]="{title: mainRequest, si: true}">Follow Up</a>
+            <a mat-list-item href="" [routerLink]="['prevention']" [queryParams]="{title: mainRequest, si: true}">Followup And Prevention</a>
+            <a mat-list-item href="" [routerLink]="['treatment']" [queryParams]="{title: mainRequest, si: true}">Followup, Prevention And Treatment</a>
+          <a mat-list-item href="" [routerLink]="['treatment']" [queryParams]="{title: mainRequest, si: true}">Bandage</a>
+
+          <!--<a mat-list-item href="" [routerLink]="['bandaging']" [queryParams]="{title: mainRequest, si: true}">Bandaging</a>-->
           <!--<a mat-list-item href="" > <i style="size: 25px" class="fa fa-notes-medical"></i></a> &lt;!&ndash; (click)="firstModal.open(); $event.stopPropagation()"&ndash;&gt;-->
 
         </mat-nav-list>

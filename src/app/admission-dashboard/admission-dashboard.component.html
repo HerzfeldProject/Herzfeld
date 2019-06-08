@@ -66,8 +66,56 @@
           </mat-card-title>
         </mat-card-header>
         <mat-card-content >
-          <div id="timelinediv" style="width: 100%"></div>
-          <div id="description">
+          <!--<div id="timelinediv" style="width: 100%"></div>-->
+          <!--<div id="description">-->
+          <mat-sidenav-container style="height: 100%;   outline: 1px solid dodgerblue;">
+            <mat-sidenav mode="side" opened role="navigation">
+              <mat-nav-list>
+                <a mat-list-item (click)="changeTime(true)">TimeLine</a>
+                <a mat-list-item (click)="changeTime(false)">Patients Details</a>
+              </mat-nav-list>
+            </mat-sidenav>
+            <mat-sidenav-content style="height: 100%;">
+              <div *ngIf="modeTimeline"><div id="timelinediv" style="width: 100%"></div>
+                </div>
+              <div *ngIf="!modeTimeline">
+                <mat-accordion>
+                <mat-expansion-panel style="background-color: rgba(3,255,22,0.56) ">
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      Patient with 100% score
+                    </mat-panel-title>
+                    <mat-panel-description>
+                      {{selectedPlan.patientList100 ? selectedPlan.patientList100.split(',').length+' patients' : '0 patients'}}
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+                  <div>{{selectedPlan.patientList100}}</div>
+                </mat-expansion-panel >
+                  <mat-expansion-panel style="background-color: rgba(255,35,0,0.56)">
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>
+                        Patient with 0% score
+                      </mat-panel-title>
+                      <mat-panel-description>
+                        {{selectedPlan.patientList0 ? selectedPlan.patientList0.split(',').length+' patients' : '0 patients'}}
+                      </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <div>{{selectedPlan.patientList0}}</div>
+                  </mat-expansion-panel>
+                  <mat-expansion-panel style="background-color: rgba(247,255,0,0.56)">
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>
+                        Patient with partial score
+                      </mat-panel-title>
+                      <mat-panel-description>
+                        {{selectedPlan.patientListPart ? selectedPlan.patientListPart.split(',').length+' patients' : '0 patients'}}
+                      </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <div>{{selectedPlan.patientListPart}}</div>
+                  </mat-expansion-panel>
+              </mat-accordion></div>
+            </mat-sidenav-content>
+          </mat-sidenav-container>
 <!--            <mat-form-field *ngIf="checked">-->
 <!--              <mat-select style="margin-top: 22px; " placeholder="Choose Patient:">-->
 <!--                <mat-option (click)="onPatientClick('311673313', 'Pain')" value="311673313">311673313</mat-option>-->
@@ -75,22 +123,7 @@
 <!--                <mat-option value="201125689">201125689</mat-option>-->
 <!--              </mat-select>-->
 <!--            </mat-form-field>-->
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </mat-grid-tile>
-  </mat-grid-list>
-  <mat-grid-list id="intervalesPatient" class="col col-lg-12 col-md-12" cols="1" >
-    <mat-grid-tile  rowHeight="fit">
-      <mat-card class="dashboard-card">
-        <mat-card-header>
-          <mat-card-title>
-            <div id="intervalsPatient"></div>
-          </mat-card-title>
-        </mat-card-header>
-        <mat-card-content >
-          <div id="timelinediv2" style="display: block;width: 100%"></div>
-          <div id="description2"></div>
+          <!--</div>-->
         </mat-card-content>
       </mat-card>
     </mat-grid-tile>

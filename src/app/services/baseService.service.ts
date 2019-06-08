@@ -303,4 +303,50 @@ patientReplay(xmlreq, message, callback){
       };
       xmlreq.send(message);
     }
+  public getDepartment( callback) {
+    const xmlreq = new XMLHttpRequest();
+    xmlreq.open('POST', 'http://medinfo2.ise.bgu.ac.il/MediatorNewTAK/queryDrivenAPI/queryDrivenAPI.svc', true);
+    xmlreq.setRequestHeader('Content-Type', 'text/xml;charset=utf-8');
+    xmlreq.responseType = 'document';
+
+    const message = '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">\n' +
+      '<s:Body>' +
+      '<GetData xmlns="http://tempuri.org/">' +
+      '<projectId>27</projectId>' +
+      '<patientIds>*</patientIds>' +
+      '<conceptId>10872</conceptId>' +
+      '<necessaryContexts/>' +
+      '<exclusionContexts />' +
+      '<contextFlag>9</contextFlag>' +
+      '</GetData>' +
+      '</s:Body>' +
+      '</s:Envelope>';
+    xmlreq.setRequestHeader('SOAPAction', 'http://tempuri.org/IQueryDrivenAPI/GetData');
+    xmlreq.onreadystatechange = function () {
+      if (xmlreq.readyState === 4) {
+        if (xmlreq.status === 200) {
+          callback.apply(this, [xmlreq.responseXML.getElementsByTagName('GetDataResult')[0].childNodes]);
+          // xmlreq.abort();
+        } else {
+          this.departmentReplay(xmlreq, message, callback);
+        }
+      }
+    }.bind(this);
+    xmlreq.send(message);
+  }
+  departmentReplay(xmlreq, message, callback){
+    xmlreq.open('POST', 'http://medinfo2.ise.bgu.ac.il/MediatorNewTAK/queryDrivenAPI/queryDrivenAPI.svc', true);
+    xmlreq.setRequestHeader('Content-Type', 'text/xml;charset=utf-8');
+    xmlreq.responseType = 'document';
+    xmlreq.setRequestHeader('SOAPAction', 'http://tempuri.org/IQueryDrivenAPI/GetData');
+    xmlreq.onreadystatechange = function () {
+      if (xmlreq.readyState === 4) {
+        if (xmlreq.status === 200) {
+          callback.apply(this, [xmlreq.responseXML.getElementsByTagName('GetDataResult')[0].childNodes]);
+          // xmlreq.abort();
+        }
+      }
+    };
+    xmlreq.send(message);
+  }
   }

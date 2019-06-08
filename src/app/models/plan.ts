@@ -4,4 +4,7 @@ export class Plan {
   name: string;
   weight: number;
   subPlans: Plan[];
+  patientList100: string;
+  patientList0: string;
+  patientListPart: string;
 }
