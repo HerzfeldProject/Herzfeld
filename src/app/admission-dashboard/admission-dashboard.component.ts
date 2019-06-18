@@ -5,7 +5,7 @@ import {AdmissionDashboardService} from './admission-dashboard.service';
 import {BarChartData} from '../models/barChartData';
 import {Weights} from '../models/weights';
 import {BaseServiceService} from '../services/baseService.service';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import {XmlToObjectService} from '../services/xml-to-object.service';
 import {DataRequest} from '../models/dataRequest';
 import {SharedRequestService} from '../services/shared-request.service';
@@ -45,9 +45,13 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit, OnDes
               private router: Router, private xmltosrv: XmlToObjectService,
               private sharedR: SharedRequestService, private objToChart: ObjectToChartService,
               private loadingScreenService: LoadingScreenService, private sharedsrv: SharedService) {
-    route.params.subscribe(val => {
-      this.init();
-      this.ngOnInit();
+
+    this.sub = this.router.events.subscribe((e: any) => {
+      this.loadingScreenService.startLoading();
+      if (e instanceof NavigationEnd) {
+        this.admissionCompliance = null;
+        this.ngOnInit();
+      }
     });
   }
   createBar(subPlans) {
@@ -178,6 +182,8 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit, OnDes
       this.admissionCompliance = this.objToChart.createPieChart(this.mainPlan.score);
       this.createBar(this.mainPlan.subPlans);
     }
+    this.loadingScreenService.stopLoading();
+    Chart.afterDraw();
   }
   onConceptInterval(name, plan) {
     document.getElementById('timelinediv').hidden = false;
@@ -231,14 +237,6 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit, OnDes
     }
   }
   ngOnInit() {
-     this.sub = this.route.params.subscribe(val => {
-      this.init();
-      document.getElementById('barDiv').innerHTML = '';
-      this.loadingScreenService.stopLoading();
-    });
-
-  }
-  init(){
     this.mainRequest = this.sharedR.request.value;
     this.mainRequest.stage = 'Admission';
     // if (localStorage.getItem('Admission') !== null) {
@@ -253,10 +251,12 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit, OnDes
     //   }
     // } else {
     this.basesrv.getCompliance(this.mainRequest, this.callback.bind(this));
-    // }
+    document.getElementById('barDiv').innerHTML = '';
+
   }
 
   ngOnDestroy(): void {
-    this.sub.unsubscribe();
-  }
+    if (this.sub) {
+      this.sub.unsubscribe();
+    }  }
 }

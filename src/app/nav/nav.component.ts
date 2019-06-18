@@ -8,6 +8,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {LoadingScreenService} from '../services/loading-screen.service';
 import {ProtocolModalComponent} from '../protocol-modal/protocol-modal.component';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'app-nav',
@@ -24,14 +25,11 @@ export class NavComponent implements OnInit {
       map(result => result.matches)
     );
   constructor(private breakpointObserver: BreakpointObserver,
-               private loadingScreenService: LoadingScreenService, private dialog: MatDialog) {
+               private loadingScreenService: LoadingScreenService, private dialog: MatDialog, private route: ActivatedRoute) {
   }
 
   ngOnInit(): void {
     console.log(this.mainRequest);
-  }
-  startload(){
-    this.loadingScreenService.startLoading();
   }
   }
 

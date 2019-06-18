@@ -75,10 +75,10 @@ export class StartComponent implements OnInit {
   }
   changeDepartment(event){
     this.optionsModel = [];
-    if(this.selectedDepartment.length !== 0) {
+    if(event.length !== 0) {
       for (let i = 0; i < this.departmentAndPatients.length; i++) {
-        for (let k = 0; k < this.selectedDepartment.length; k++) {
-          if (this.selectedDepartment[k] === this.departmentAndPatients[i].dep) {
+        for (let k = 0; k < event.length; k++) {
+          if (event[k] === this.departmentAndPatients[i].dep) {
             if(! this.optionsModel.includes(this.departmentAndPatients[i].patients)) {
               this.optionsModel.push(this.departmentAndPatients[i].patients);
             }
@@ -86,7 +86,16 @@ export class StartComponent implements OnInit {
         }
       }
     } else {
-      this.optionsModel = [];
+      while (this.optionsModel.length > 0) {
+        this.optionsModel.pop();
+      }
+    }
+  }
+  changePatients(event) {
+    if(event.length === 0) {
+      while (this.selectedDepartment.length > 0) {
+        this.selectedDepartment.pop();
+      }
     }
   }
   Submit() {

@@ -42,7 +42,7 @@
     <div class="col-sm-2 col-md-2 col-lg-2">
       <p class="input-group" style="width:20px;margin-top: 8px;">
         <label>Patients:</label>
-        <ss-multiselect-dropdown style="display: block; " [options]="myOptions" [(ngModel)]="optionsModel"  [settings]="multiSelectSettings"></ss-multiselect-dropdown>
+        <ss-multiselect-dropdown style="display: block; " (ngModelChange)="changePatients($event)" [options]="myOptions" [(ngModel)]="optionsModel"  [settings]="multiSelectSettings"></ss-multiselect-dropdown>
       </p>
     </div>
     <div class="col-sm-2 col-md-2 col-lg-2">

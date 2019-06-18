@@ -25,14 +25,6 @@ export class LoginComponent implements OnInit {
   answer = null;
   @Output() isLogin;
 
-  // @HostListener('window:beforeunload')
-  // doSomething() {
-  //   do {
-  //     this.loading = true;
-  //     this.basesrv.authenticate(this.user1, this.callback.bind(this));
-  //   } while (this.answer === null);
-  // }
-
   constructor(
     private formBuilder: FormBuilder,
     private route: ActivatedRoute,

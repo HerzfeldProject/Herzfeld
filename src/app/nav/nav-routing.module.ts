@@ -14,14 +14,16 @@ const routes: Routes = [
     path: 'nav',
     component: StartComponent,
     children: [
-      {path: '', component: StartComponent},
+      {path: '', pathMatch: 'full', redirectTo: 'nav'},
       {path: 'admission', component: AdmissionDashboardComponent},
       {path: 'followup' , component: FollowUpDashboardComponent},
       {path: 'prevention', component: PreventionDashboardComponent},
       {path: 'treatment', component: TreatmentDashboardComponent},
       {path: 'summary', component: SummaryDashboardComponent},
       {path: 'bandage', component: BandagingDashboardComponent},
-    ]
+    ],
+    // canActivate: [AuthenticationGuard],
+    runGuardsAndResolvers: 'always',
   }
 ];
 

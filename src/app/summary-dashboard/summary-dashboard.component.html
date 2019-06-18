@@ -30,7 +30,7 @@
           <div class="col-lg-3 col-md-3"><h5>
             Weight Distribution: <br><br>
             <table style="font-weight: normal">
-              <tr *ngFor="let plan of mainPlan.subPlans"><th>{{plan.name}}</th><th>{{(plan.weight *100).toFixed(0)}}%</th></tr>
+              <tr *ngFor="let plan of mainPlan"><th>{{plan.name}}</th><th>{{(plan.weight *100).toFixed(0)}}%</th></tr>
               <!--{{plan.name}} - {{plan.weight *100}} % <br>-->
             </table>
           </h5></div>
