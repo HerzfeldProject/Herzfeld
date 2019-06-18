@@ -11,7 +11,7 @@ import {DataRequest} from '../models/dataRequest';
 import {XmlToObjectService} from '../services/xml-to-object.service';
 import {SharedRequestService} from '../services/shared-request.service';
 import {LoadingScreenService} from '../services/loading-screen.service';
-import {Router} from '@angular/router';
+import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import {ProtocolModalComponent} from '../protocol-modal/protocol-modal.component';
 import {MatDialog} from '@angular/material';
 // import {DataInstance} from '../models/dataInstance';
@@ -25,15 +25,16 @@ import {MatDialog} from '@angular/material';
 })
 export class StartComponent implements OnInit {
 
-  selectedDepartment: string;
+  departmentAndPatients = [];
+  selectedDepartment: string[] = [];
   mainRequest: DataRequest;
   public serched = true;
   fromDate: Date;
   toDate: Date;
   selectedBase: string;
-  optionsModel: string[];
+  optionsModel: string[] = [];
   patients: NodeList = null;
-  department = null;
+  department: IMultiSelectOption[]  = [];
   myOptions: IMultiSelectOption[] = [];
 
   public multiSelectSettings: IMultiSelectSettings = {
@@ -46,17 +47,19 @@ export class StartComponent implements OnInit {
     from: false,
     to: false
   };
-  constructor(private valService: BaseServiceService,    private router: Router,
+  constructor(private valService: BaseServiceService,    private router: Router, private route: ActivatedRoute,
               private _http: HttpClient, private dialog: MatDialog,  private basesrv: BaseServiceService, private xmltosrv: XmlToObjectService, private sharedR: SharedRequestService, private loadingScreenService: LoadingScreenService) {
   }
   ngOnInit() {
     this.toDate = new Date();
     this.fromDate = new Date(2016, 1, 1);
-    this.basesrv.getPatients(data => {
-      this.myOptions = this.xmltosrv.prepareXMLofPatients(data);
-    });
     this.basesrv.getDepartment(data =>{
-      this.department = this.xmltosrv.prepareXMLofDepartment(data);
+      this.departmentAndPatients = this.xmltosrv.prepareXMLofDepartmentWithPatints(data);
+      this.department = this.xmltosrv.prepareXMLofDepartment(this.departmentAndPatients);
+      this.basesrv.getPatients(data1 => {
+        this.myOptions = this.xmltosrv.prepareXMLofPatients(data1);
+        this.loadingScreenService.stopLoading();
+      });
     });
   }
   openDialog(): void {
@@ -70,11 +73,24 @@ export class StartComponent implements OnInit {
       console.log('The dialog was closed');
     });
   }
+  changeDepartment(event){
+    this.optionsModel = [];
+    if(this.selectedDepartment.length !== 0) {
+      for (let i = 0; i < this.departmentAndPatients.length; i++) {
+        for (let k = 0; k < this.selectedDepartment.length; k++) {
+          if (this.selectedDepartment[k] === this.departmentAndPatients[i].dep) {
+            if(! this.optionsModel.includes(this.departmentAndPatients[i].patients)) {
+              this.optionsModel.push(this.departmentAndPatients[i].patients);
+            }
+          }
+        }
+      }
+    } else {
+      this.optionsModel = [];
+    }
+  }
   Submit() {
-    // this.router.navigate(['nav']);
     this.loadingScreenService.startLoading();
-    this.router.navigate(['nav/admission']);
-    this.loadingScreenService.stopLoading();
     localStorage.clear();
     const request = new DataRequest();
     if (this.selectedBase === '1') {
@@ -89,23 +105,7 @@ export class StartComponent implements OnInit {
     this.mainRequest = request;
     this.sharedR.changeRequest(request);
     this.serched = false;
+    this.router.navigate(['nav/admission'], {queryParams: {title: this.mainRequest, si: true}});
 
-
-    // send the request to the other pages
-    // this.basesrv.getCompliance(request, data => {
-    //   const plan = this.xmltosrv.prepareXMLofCompliance(data);
-    //   console.log(plan);
-    // });
-    // this.basesrv.getSubPlanes(data => {
-    //   const result = this.xmltosrv.prepareXMLofSubPlans(data);
-    //   console.log(result);
-    // });
-    // this.basesrv.getKnowledge(data => {
-    //   const plan = this.xmltosrv.prepareXMLofKnowledge(data);
-    //   console.log(plan);
-    // });
-    // this.basesrv.getData(request, data => {
-    //   console.log(this.xmltosrv.prepareXMLofDATA(data));
-    // });
   }
 }

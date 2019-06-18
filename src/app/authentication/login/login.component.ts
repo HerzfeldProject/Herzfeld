@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import {Component, HostListener, OnInit, Output} from '@angular/core';
 
 import {Router, ActivatedRoute, RouterEvent, NavigationStart, NavigationEnd, NavigationCancel, NavigationError} from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -23,6 +23,7 @@ export class LoginComponent implements OnInit {
   userError = false;
   user1 = new user();
   answer = null;
+  @Output() isLogin;
 
   // @HostListener('window:beforeunload')
   // doSomething() {
@@ -79,6 +80,7 @@ export class LoginComponent implements OnInit {
     if(this.answer !== null) {
           this.answer = this.answer.getElementsByTagName('AuthenticateResult')[0].innerHTML;
         if (this.answer === 'true') {
+          this.isLogin = true;
           this.router.navigate([this.returnUrl]);
         this.loading = true;
       } else {

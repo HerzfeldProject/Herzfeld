@@ -4,6 +4,9 @@ import {BarChartData} from '../models/barChartData';
 import {XmlToObjectService} from './xml-to-object.service';
 import {BaseServiceService} from './baseService.service';
 import {forEach} from '@angular/router/src/utils/collection';
+import {SharedService} from './shared.service';
+import { Chart } from 'chart.js';
+
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +16,7 @@ export class ObjectToChartService {
   mainReq;
   mainPlan;
 
-  constructor(private xmltosrv: XmlToObjectService, private basesrv: BaseServiceService) {
+  constructor(private xmltosrv: XmlToObjectService, private basesrv: BaseServiceService, private tooltipsrv: SharedService) {
   }
 
   createPieChart(score) {
@@ -32,6 +35,53 @@ export class ObjectToChartService {
       }
     };
     return admissionCompliance;
+  }
+  createBar(subPlans) {
+    const admissionConcepts = new BarChartData();
+    admissionConcepts.datasets = [{data: [], label: 'Completion percentages', metadata: [],
+      backgroundColor: ['#51bcc2', '#51bcc2', '#51bcc2', '#51bcc2', '#51bcc2', '#51bcc2']}];
+    admissionConcepts.labels = [];
+    for (let i = 0; i < subPlans.length; i++) {
+      admissionConcepts.labels.push(subPlans[i].name);
+      admissionConcepts.datasets[0].data.push(subPlans[i].score);
+      admissionConcepts.datasets[0].metadata.push(subPlans[i]);
+    }
+    admissionConcepts.options = {
+      tooltips: {
+        enabled: false,
+        custom: this.tooltipsrv.histogToolTip
+      },
+      // onClick: this.onDrillDown.bind(this),
+      responsive: true,
+      scaleShowVerticalLines: false,
+      scales: {
+        xAxes: [{
+          ticks: {
+            autoSkip: false
+          }
+        }
+        ],
+        yAxes: [{
+          ticks: {
+            beginAtZero: true,
+            suggestedMax: 1,
+          }
+        }]
+      },
+    };
+    const father = document.getElementById('barDiv');
+    father.innerHTML = '';
+    const canvas = <HTMLCanvasElement>document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: admissionConcepts.labels,
+        datasets: admissionConcepts.datasets,
+      },
+      options: admissionConcepts.options
+    });
+    father.appendChild(canvas);
   }
 
   createBarChart(subPlans, mainReq) {

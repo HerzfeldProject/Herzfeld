@@ -1,3 +1,4 @@
+
 export class Plan {
   conceptId: string;
   score: number;
@@ -7,4 +8,5 @@ export class Plan {
   patientList100: string;
   patientList0: string;
   patientListPart: string;
+  icons: string[];
 }

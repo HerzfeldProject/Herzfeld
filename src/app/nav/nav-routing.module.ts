@@ -14,19 +14,19 @@ const routes: Routes = [
     path: 'nav',
     component: StartComponent,
     children: [
-      {path: '', component: NavComponent},
+      {path: '', component: StartComponent},
       {path: 'admission', component: AdmissionDashboardComponent},
       {path: 'followup' , component: FollowUpDashboardComponent},
       {path: 'prevention', component: PreventionDashboardComponent},
       {path: 'treatment', component: TreatmentDashboardComponent},
       {path: 'summary', component: SummaryDashboardComponent},
-      {path: 'bandaging', component: BandagingDashboardComponent},
+      {path: 'bandage', component: BandagingDashboardComponent},
     ]
   }
 ];
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)],
+  imports: [RouterModule.forRoot(routes, {onSameUrlNavigation: 'reload'})],
   exports: [RouterModule]
 })
 export class NavRoutingModule { }

@@ -16,7 +16,7 @@ export class BaseServiceService implements OnInit {
 
   public proxy;
   public message;
-  constructor( private _http: HttpClient, private loadingScreenService: LoadingScreenService) { }
+  constructor( private _http: HttpClient) { }
 
   ngOnInit() {
   }
@@ -324,7 +324,8 @@ patientReplay(xmlreq, message, callback){
     xmlreq.setRequestHeader('SOAPAction', 'http://tempuri.org/IQueryDrivenAPI/GetData');
     xmlreq.onreadystatechange = function () {
       if (xmlreq.readyState === 4) {
-        if (xmlreq.status === 200) {
+        if (xmlreq.status === 200 && xmlreq.responseXML.getElementsByTagName('GetDataResult')[0].childNodes.length > 0) {
+          console.log(xmlreq.responseXML.getElementsByTagName('GetDataResult')[0].childNodes.length)
           callback.apply(this, [xmlreq.responseXML.getElementsByTagName('GetDataResult')[0].childNodes]);
           // xmlreq.abort();
         } else {
@@ -341,7 +342,7 @@ patientReplay(xmlreq, message, callback){
     xmlreq.setRequestHeader('SOAPAction', 'http://tempuri.org/IQueryDrivenAPI/GetData');
     xmlreq.onreadystatechange = function () {
       if (xmlreq.readyState === 4) {
-        if (xmlreq.status === 200) {
+        if (xmlreq.status === 200 && xmlreq.responseXML.getElementsByTagName('GetDataResult')[0].childNodes.length>0) {
           callback.apply(this, [xmlreq.responseXML.getElementsByTagName('GetDataResult')[0].childNodes]);
           // xmlreq.abort();
         }

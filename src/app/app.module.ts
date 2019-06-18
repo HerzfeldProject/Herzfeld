@@ -50,7 +50,6 @@ import { BandagingDashboardComponent } from './bandaging-dashboard/bandaging-das
 // import {ModalModule} from 'ng2-modal';
 import { LoadingScreenComponent } from './loading-screen/loading-screen.component';
 import { ProtocolModalComponent } from './protocol-modal/protocol-modal.component';
-
 // import {NgxSoapModule} from 'ngx-soap';
 // import {Proxy, BasicHttpBinding} from 'wcf.js';
 
@@ -63,10 +62,10 @@ import { ProtocolModalComponent } from './protocol-modal/protocol-modal.componen
     FollowUpDashboardComponent,
     PreventionDashboardComponent,
     TreatmentDashboardComponent,
+    BandagingDashboardComponent,
     SummaryDashboardComponent,
     LoginComponent,
     StartComponent,
-    BandagingDashboardComponent,
     LoadingScreenComponent,
     ProtocolModalComponent
   ],
@@ -113,7 +112,7 @@ import { ProtocolModalComponent } from './protocol-modal/protocol-modal.componen
     MatFormFieldModule,
     MatDialogModule, MatFormFieldModule, MatExpansionModule, MatAccordion, MatSidenavModule, MatButtonModule, MatInputModule
   ],
-  providers: [ Weights, Concepts],
+  providers: [ ],
   bootstrap: [AppComponent],
   entryComponents: [ProtocolModalComponent]
 })

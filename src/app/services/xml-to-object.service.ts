@@ -1,10 +1,13 @@
 import { Injectable } from '@angular/core';
 import {Plan} from '../models/plan';
 import {DataInstance} from '../models/dataInstance';
+// import {planType} from '../models/planType';
 
 @Injectable({
   providedIn: 'root'
 })
+
+
 export class XmlToObjectService {
 
   constructor() { }
@@ -40,6 +43,7 @@ export class XmlToObjectService {
   }
   createSubPlan(start) {
     const plan = new Plan();
+    plan.icons = [];
     plan.name = start.attributes.name.nodeValue;
     if (start.attributes.concept_id !== undefined) {
       plan.conceptId = start.attributes.concept_id.nodeValue;
@@ -71,6 +75,7 @@ export class XmlToObjectService {
         const sub = new Plan();
         sub.name = start.children[k].localName;
         plan.subPlans.push(sub);
+        plan.icons.push(sub.name);
       }
     }
     return plan;
@@ -91,11 +96,24 @@ export class XmlToObjectService {
     }
     return temp;
   }
-  prepareXMLofDepartment(data) {
+  prepareXMLofDepartmentWithPatints(data) {
     const temp = [];
     if (data.length > 0) {
       for (let i = 0; i < data.length; i++) {
-        temp.push({dep: data.item(0).children[4].textContent, patients: data.item(0).children[2].textContent});
+        temp.push({dep: data.item(i).children[4].textContent,  patients: data.item(i).children[2].textContent});
+      }
+    }
+    return temp;
+  }
+  prepareXMLofDepartment(data) {
+    const names = [];
+    const temp = [];
+    if (data.length > 0) {
+      for (let i = 0; i < data.length; i++) {
+        if(!names.includes(data[i].dep)) {
+          names.push(data[i].dep)
+          temp.push({id: data[i].dep, name: data[i].dep});
+        }
       }
     }
     return temp;
@@ -124,6 +142,34 @@ export class XmlToObjectService {
     }
     relevantData.sort((a, b) => b.value - a.value );
     return relevantData;
+  }
+  combinIntervals(data){
+    const start = [];
+    const end = [];
+    const newInt = [];
+    for (let i = 0; i < data.length; i++) {
+      if(!start.includes(data[i].startTime.substring(0, data[i].startTime.indexOf('T'))
+        && ! end.includes(data[i].endTime.substring(0, data[i].endTime.indexOf('T'))))){
+        let entity = data[i].entityId;
+        for(let k = i+1; k < data.length; k++){
+          if( data[i].value == data[k].value
+            && data[i].startTime.substring(0, data[i].startTime.indexOf('T')) == data[k].startTime.substring(0, data[k].startTime.indexOf('T'))
+            && (data[i].endTime.substring(0, data[i].endTime.indexOf('T')) == data[k].endTime.substring(0, data[k].endTime.indexOf('T')) )){
+            entity = entity + ', ' + data[k].entityId;
+          }
+        }
+        start.push(data[i].startTime.substring(0, data[i].startTime.indexOf('T')));
+        end.push(data[i].endTime.substring(0, data[i].endTime.indexOf('T')));
+        const n = new DataInstance();
+        n.startTime = data[i].startTime;
+        n.endTime = data[i].endTime;
+        n.value = data[i].value;
+        n.entityId = entity;
+        newInt.push(n);
+        i++;
+      }
+    }
+    return newInt;
   }
   fromPlanNameToRelevantConceptId(subPlan, name, isFirst) {
     const conceptIds = [];

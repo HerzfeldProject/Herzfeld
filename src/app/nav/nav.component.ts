@@ -24,11 +24,14 @@ export class NavComponent implements OnInit {
       map(result => result.matches)
     );
   constructor(private breakpointObserver: BreakpointObserver,
-               private loadinScreenService: LoadingScreenService, private dialog: MatDialog) {
+               private loadingScreenService: LoadingScreenService, private dialog: MatDialog) {
   }
 
   ngOnInit(): void {
     console.log(this.mainRequest);
+  }
+  startload(){
+    this.loadingScreenService.startLoading();
   }
   }
 

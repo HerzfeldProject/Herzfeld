@@ -29,12 +29,13 @@
         <mat-card-content class="col-lg-12 col-md-12">
           <div class="col-lg-3 col-md-3"><h5>
             Weight Distribution: <br><br>
-            <div *ngFor="let plan of mainPlan">
-              {{plan.name}} - {{plan.weight *100}} % <br>
-            </div>
+            <table style="font-weight: normal">
+              <tr *ngFor="let plan of mainPlan.subPlans"><th>{{plan.name}}</th><th>{{(plan.weight *100).toFixed(0)}}%</th></tr>
+              <!--{{plan.name}} - {{plan.weight *100}} % <br>-->
+            </table>
           </h5></div>
           <div class="col-lg-9 col-md-9">
-            <canvas #mychart baseChart [data]="sumCompliance.finalValue" [labels]="['True','False']" [chartType]="'doughnut'" [options]="sumCompliance.options" [colors]="colorsCompliance" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+            <canvas *ngIf="sumCompliance.finalValue" #mychart baseChart [data]="sumCompliance.finalValue" [labels]="['True','False']" [chartType]="'doughnut'" [options]="sumCompliance.options" [colors]="colorsCompliance"></canvas>
           </div>
         </mat-card-content>
       </mat-card>

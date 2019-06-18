@@ -1,4 +1,3 @@
-
 <div *ngIf="pageError">
   <mat-grid-list  class="col col-lg-12 col-md-12" cols="1" >
     <mat-grid-tile>
@@ -9,14 +8,13 @@
           </mat-card-title>
         </mat-card-header>
         <mat-card-content >
-          <div style="text-align: center; color: #0071c5; size: 300px">No Data In Follow Up Stage</div>
+          <div style="text-align: center; color: #0071c5; size: 300px">No Data In Followup Stage</div>
         </mat-card-content>
       </mat-card>
     </mat-grid-tile>
   </mat-grid-list>
-</div>
-<div *ngIf="!pageError" class="grid-container col col-lg-12 col-md-12">
-  <h1 class="mat-h1" style="text-align: center">Follow Up</h1>
+</div><div *ngIf="!pageError" class="grid-container col col-lg-12 col-md-12">
+  <h1 class="mat-h1" style="text-align: center">Followup</h1>
   <mat-grid-list class="col col-lg-12 col-md-12" cols="2" rowHeight="3:2">
     <mat-grid-tile>
       <mat-card class="dashboard-card">
@@ -29,31 +27,41 @@
         <mat-card-content class="col-lg-12 col-md-12">
           <div class="col-lg-3 col-md-3"><h5>
             Weight Distribution: <br><br>
-            <div *ngFor="let plan of mainPlan.subPlans">
-              {{plan.name}} - {{plan.weight *100}} % <br>
-            </div>
+            <table style="font-weight: normal">
+              <tr *ngFor="let plan of mainPlan.subPlans"><th>{{plan.name}}</th><th>{{(plan.weight *100).toFixed(0)}}%</th></tr>
+              <!--{{plan.name}} - {{plan.weight *100}} % <br>-->
+            </table>
           </h5></div>
           <div class="col-lg-9 col-md-9">
-            <canvas #mychart baseChart [data]="followUpCompliance.finalValue" [labels]="['True','False']" [chartType]="'doughnut'" [options]="followUpCompliance.options" [colors]="colorsCompliance" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+
+            <canvas #mychart baseChart [data]="followUpCompliance.finalValue" [labels]="['True','False']" [chartType]="'doughnut'" [options]="followUpCompliance.options" [colors]="colorsCompliance" ></canvas>
+
           </div>
         </mat-card-content>
       </mat-card>
     </mat-grid-tile>
-    <mat-grid-tile >
-      <mat-card  class="dashboard-card">
-        <i (click)="onDrillUp()" title="Go Back" style="cursor: pointer; float: right;margin-right: 0; font-size: 25px" *ngIf="levelOfDrillDown>0" class="fa fa-arrow-circle-left"></i>
+    <mat-grid-tile rowHeight="fit">
+      <mat-card class="dashboard-card">
+        <i style="color: #000; text-align: center;float: right; margin-right: auto;margin-left: auto ">
+          <i style="margin: 10px; font-size: 20px; cursor: pointer" title="Binary - action done at least once" class="fa fa-check-square"></i>
+          <i style="margin: 10px; font-size: 20px; cursor: pointer" title="Start Condition -  include right treatments given condition, and right condition given treatment" class="fa fa-filter"></i>
+          <i style="margin: 10px; font-size: 20px; cursor: pointer" title="Periodic - include cardinality and frequency scores" class="fa fa-history"></i>
+          <i style="margin: 10px; font-size: 20px; cursor: pointer" title="Average" class="fa fa-percent"></i>
+          <i style="margin: 10px; font-size: 20px; cursor: pointer" title="Order" class="fa fa-sort-amount-up"></i>
+        </i>
         <mat-card-header>
-          <mat-card-title>
-            <h5 style="font-size: 20px; color: #0071c5">Detailed Admission Scores:
+          <mat-card-title style="width: auto">
+            <h5 style="font-size: 20px; color: #0071c5">Detailed Scores:
+              <i (click)="onDrillUp()" matTooltip="Go Previous" style="cursor: pointer; font-size: 20px" *ngIf="levelOfDrillDown>0" class="fa fa-arrow-circle-left"></i>
             </h5>
             <h6 style="font-size: 15px;" id="moreDetails">
             </h6>
-
           </mat-card-title>
         </mat-card-header>
         <mat-card-content class="dashboard-card-content">
 
-          <div id="barDivFollowup" >
+          <div id="barDiv" style="display: block">
+
           </div>
         </mat-card-content>
       </mat-card>
@@ -68,24 +76,57 @@
           </mat-card-title>
         </mat-card-header>
         <mat-card-content >
-          <div id="timelinediv" style="width: 100%"></div>
-          <div id="description">
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </mat-grid-tile>
-  </mat-grid-list>
-  <mat-grid-list id="intervalesPatient" class="col col-lg-12 col-md-12" cols="1" >
-    <mat-grid-tile  rowHeight="fit">
-      <mat-card class="dashboard-card">
-        <mat-card-header>
-          <mat-card-title>
-            <div id="intervalsPatient"></div>
-          </mat-card-title>
-        </mat-card-header>
-        <mat-card-content >
-          <div id="timelinediv2" style="display: block;width: 100%"></div>
-          <div id="description2"></div>
+          <mat-sidenav-container style="height: 100%;outline: 1px solid dodgerblue;">
+            <mat-sidenav style="outline: 1px solid dodgerblue;" mode="side" opened role="navigation">
+              <mat-nav-list>
+                <a mat-list-item [ngClass]="{red: modeTimeline === false} " (click)="changeTime(false)">Patients Details</a>
+                <a mat-list-item [ngClass]="{red: modeTimeline === true}" (click)="changeTime(true)">TimeLine</a>
+
+              </mat-nav-list>
+            </mat-sidenav>
+            <mat-sidenav-content style="height: 100%;width: 100%">
+              <div id="timelinediv" style="width: 100%">
+              </div>
+              <div id="timeline"></div>
+              <div *ngIf="!modeTimeline">
+                <mat-accordion>
+                  <mat-expansion-panel style="background-color: rgba(3,255,22,0.56) ">
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>
+                        Patient with 100% score
+                      </mat-panel-title>
+                      <mat-panel-description>
+                        {{selectedPlan.patientList100 ? selectedPlan.patientList100.split(',').length+' patients' : '0 patients'}}
+                      </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <div>{{selectedPlan.patientList100}}</div>
+                  </mat-expansion-panel >
+
+                  <mat-expansion-panel style="background-color: rgba(247,255,0,0.56)">
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>
+                        Patient with partial score
+                      </mat-panel-title>
+                      <mat-panel-description>
+                        {{selectedPlan.patientListPart ? selectedPlan.patientListPart.split(',').length+' patients' : '0 patients'}}
+                      </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <div>{{selectedPlan.patientListPart}}</div>
+                  </mat-expansion-panel>
+                  <mat-expansion-panel style="background-color: rgba(255,35,0,0.56)">
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>
+                        Patient with 0% score
+                      </mat-panel-title>
+                      <mat-panel-description>
+                        {{selectedPlan.patientList0 ? selectedPlan.patientList0.split(',').length+' patients' : '0 patients'}}
+                      </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <div>{{selectedPlan.patientList0}}</div>
+                  </mat-expansion-panel>
+                </mat-accordion></div>
+            </mat-sidenav-content>
+          </mat-sidenav-container>
         </mat-card-content>
       </mat-card>
     </mat-grid-tile>

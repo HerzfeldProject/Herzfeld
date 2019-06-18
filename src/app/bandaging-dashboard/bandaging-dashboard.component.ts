@@ -10,6 +10,8 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {XmlToObjectService} from '../services/xml-to-object.service';
 import {SharedRequestService} from '../services/shared-request.service';
 import {ObjectToChartService} from '../services/object-to-chart.service';
+import {LoadingScreenService} from '../services/loading-screen.service';
+import {SharedService} from '../services/shared.service';
 @Component({
   selector: 'app-bandaging-dashboard',
   templateUrl: './bandaging-dashboard.component.html',
@@ -17,6 +19,14 @@ import {ObjectToChartService} from '../services/object-to-chart.service';
 })
 export class BandagingDashboardComponent implements OnInit, AfterViewInit {
 
+  sameChart = false;
+  selectedPlan: Plan;
+  modeTimeline = true;
+  public endDrill = false;
+  public detailText = '';
+  public tempSubPlans = [];
+  public levels = [];
+  public levelOfDrillDown = 0;
   public pageError = false;
   public mainRequest: DataRequest;
   public checked = false;
@@ -29,68 +39,200 @@ export class BandagingDashboardComponent implements OnInit, AfterViewInit {
   public bandCompliance: PieChartData;
   public bandConcepts: BarChartData;
 
-  constructor(private admDashService: AdmissionDashboardService, public basesrv: BaseServiceService,   private route: ActivatedRoute,
+  constructor(private admDashService: AdmissionDashboardService, public basesrv: BaseServiceService, private route: ActivatedRoute,
               private router: Router, private xmltosrv: XmlToObjectService,
-              private sharedR: SharedRequestService, private objToChart: ObjectToChartService) {
+              private sharedR: SharedRequestService, private objToChart: ObjectToChartService,
+              private loadingScreenService: LoadingScreenService, private sharedsrv: SharedService) {
     this.mainRequest = this.sharedR.request.value;
     this.mainRequest.stage = 'Bandage';
-    // followUpAndPrevention, followUpAndPreventionAndTreatment
-    if(localStorage.getItem('Bandage') !== null ) {
-      if(localStorage.getItem('Bandage') == 'no data'){
-        this.pageError = true;
+    this.basesrv.getCompliance(this.mainRequest, this.callback.bind(this));
+  }
+  createBar(subPlans) {
+    this.tempSubPlans = subPlans;
+    this.bandConcepts = new BarChartData();
+    this.bandConcepts.datasets = [{data: [], label: 'Completion percentages', metadata: [],
+      backgroundColor: []}];
+    this.bandConcepts.labels = [];
+    for (let i = 0; i < subPlans.length; i++) {
+      this.bandConcepts.labels.push(subPlans[i].name);
+      this.bandConcepts.datasets[0].data.push(subPlans[i].score);
+      this.bandConcepts.datasets[0].metadata.push(subPlans[i]);
+      if(subPlans[i].subPlans.length > 1){
+        this.bandConcepts.datasets[0].backgroundColor.push('#914500');
       } else {
-        this.mainPlan = JSON.parse(localStorage.getItem('Bandage'));
-        this.checked = false;
-        // create pie chart
-        this.bandCompliance = this.objToChart.createPieChart(this.mainPlan.score);
-        // create bar chart
-        this.bandConcepts = this.objToChart.createBarChart(this.mainPlan.subPlans, this.mainRequest);
+        this.bandConcepts.datasets[0].backgroundColor.push('#ff6c00');
       }
-
-    } else {
-      this.basesrv.getCompliance(this.mainRequest, data => {
-        this.mainPlan = this.xmltosrv.prepareXMLofCompliance(data);
-        if(this.mainPlan.score == -1) {
-          this.pageError = true;
-          localStorage.setItem('bandaging', 'no data');
-        } else {
-          localStorage.setItem('bandaging', JSON.stringify(this.mainPlan));
-          this.checked = false;
-          // create pie chart
-          this.bandCompliance = this.objToChart.createPieChart(this.mainPlan.score);
-          // create bar chart
-          this.bandConcepts = this.objToChart.createBarChart(this.mainPlan.subPlans, this.mainRequest);
-        }
-      });
     }
-    console.log(this.mainPlan);
+    this.bandConcepts.options = {
+      tooltips: {
+        enabled: false,
+        custom: this.sharedsrv.histogToolTip
+      },
+      onClick: this.onDrillDown.bind(this),
+      responsive: true,
+      scaleShowVerticalLines: false,
+      scales: {
+        xAxes: [{
+          ticks: {
+            autoSkip: false
+          }
+        }
+        ],
+        yAxes: [{
+          ticks: {
+            beginAtZero: true,
+            suggestedMax: 1,
+          }
+        }]
+      },
+    };
+    const father = document.getElementById('barDiv');
+    father.innerHTML = '';
+    const canvas = <HTMLCanvasElement>document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: this.bandConcepts.labels,
+        datasets: this.bandConcepts.datasets,
+      },
+      options: this.bandConcepts.options
+    });
+    father.appendChild(canvas);
   }
 
-  ngAfterViewInit() {
-    Chart.pluginService.register({
-      afterDraw: function (chart) {
-        if (chart.config.options.elements.center) {
-          const helpers = Chart.helpers;
-          const centerX = (chart.chartArea.left + chart.chartArea.right) / 2;
-          const centerY = (chart.chartArea.top + chart.chartArea.bottom) / 2;
-          const ctx = chart.chart.ctx;
-          ctx.save();
-          const fontSize = helpers.getValueOrDefault(chart.config.options.elements.center.fontSize,
-            Chart.defaults.global.defaultFontSize);
-          const fontStyle = helpers.getValueOrDefault(chart.config.options.elements.center.fontStyle,
-            Chart.defaults.global.defaultFontStyle);
-          const fontFamily = helpers.getValueOrDefault(chart.config.options.elements.center.fontFamily,
-            Chart.defaults.global.defaultFontFamily);
-          const font = helpers.fontString(fontSize, fontStyle, fontFamily);
-          ctx.font = font;
-          ctx.fillStyle = helpers.getValueOrDefault(chart.config.options.elements.center.fontColor, Chart.defaults.global.defaultFontColor);
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(chart.config.options.elements.center.text, centerX, centerY);
-          ctx.restore();
+  onDrillDown(c, i) {
+    if(!this.sameChart) {
+      if (this.endDrill) {
+        const lastArrow = this.detailText.lastIndexOf('<i class="fa fa-arrow-right"></i>');
+        const oneBefore = this.detailText.substring(0, lastArrow).lastIndexOf('<i class="fa fa-arrow-right"></i>');
+        this.detailText = this.detailText.substring(0, oneBefore + 33);
+      }
+      this.levels.push(this.tempSubPlans);
+      if (this.levelOfDrillDown == 0) {
+        this.detailText = '';
+      }
+    } else {
+      this.levels.push(this.tempSubPlans);
+      this.detailText = this.detailText.substring(0, this.detailText.lastIndexOf('<button'));
+    }
+    const conceptName = i[0]._model.label;
+    let sub = [];
+    let textToAdd = '';
+    for (let i = 0; i < this.tempSubPlans.length; i++) {
+      if (this.tempSubPlans[i].name == conceptName) {
+        textToAdd = conceptName ;
+        sub = this.tempSubPlans[i].subPlans;
+        if(sub.length > 1){
+          this.levelOfDrillDown++;
         }
-      },
+        if (this.tempSubPlans[i].score !== undefined) {
+          this.endDrill = false;
+          textToAdd = textToAdd + ' - ' + Number(this.tempSubPlans[i].score).toFixed(2);
+        }
+        if (this.tempSubPlans[i].conceptId !== undefined) {
+          textToAdd = '<button title="Show Time Intervals" (click)="' +
+            this.onConceptInterval( conceptName , this.tempSubPlans[i]) + '">' + textToAdd + '</button>';
+        }
+        textToAdd = textToAdd + '<i class="fa fa-arrow-right"></i> ';
+        this.detailText = this.detailText + textToAdd;
+        break;
+      }
+    }
+    document.getElementById('moreDetails').innerHTML = this.detailText;
+    if (sub[0].score !== undefined) {
+      this.createBar(sub);
+      this.sameChart = false;
+      this.levelOfDrillDown++;
+    } else {
+      this.endDrill = true;
+      this.sameChart = true;
+    }
+  }
+  onDrillUp(){
+    this.levelOfDrillDown --;
+    if (this.levelOfDrillDown === 0) {
+      this.endDrill = false;
+      this.detailText = '';
+    }    else {
+      const lastArrow = this.detailText.lastIndexOf('<i class="fa fa-arrow-right"></i>');
+      const oneBefore = this.detailText.substring(0, lastArrow).lastIndexOf('<i class="fa fa-arrow-right"></i>');
+      this.detailText = this.detailText.substring(0, oneBefore + 33);
+    }
+    document.getElementById('moreDetails').innerHTML = this.detailText;
+    const temp = this.levels.pop();
+    this.createBar(temp);
+  }
+
+  callback(data){
+    this.loadingScreenService.stopLoading();
+    this.mainPlan = this.xmltosrv.prepareXMLofCompliance(data);
+    if(this.mainPlan.score == -1) {
+      localStorage.setItem('Bandage', 'no dada');
+      this.pageError = true;
+    } else {
+      localStorage.setItem('Bandage', JSON.stringify(this.mainPlan));
+      console.log(this.mainPlan);
+      this.checked = false;
+      // create pie chart
+      this.bandCompliance = this.objToChart.createPieChart(this.mainPlan.score);
+      // create bar chart
+      this.createBar(this.mainPlan.subPlans);
+    }
+  }
+  onConceptInterval(name, plan) {
+    document.getElementById('timelinediv').hidden = false;
+    this.loadingScreenService.startLoading();
+    this.selectedPlan = plan;
+    document.getElementById('timeline').innerHTML = '';
+    const child = document.getElementById('intervalsPatients');
+    child.innerHTML = '';
+    this.basesrv.getData(this.mainRequest, plan.conceptId, data => {
+      const temp = this.xmltosrv.prepareXMLofDATA(data);
+      let relevant = this.xmltosrv.createDataInstances(temp, this.mainRequest.startDate, this.mainRequest.endDate);
+      relevant = this.xmltosrv.combinIntervals(relevant);
+      const titleOfIntervales = document.createElement('h5');
+      titleOfIntervales.style.color = '#0071c5';
+      titleOfIntervales.style.fontSize = '20px';
+      let text = name + ' Compliance <br><br>';
+      text = text + 'Start date: ' + this.mainRequest.startDate.toDateString() + '<br><br>';
+      text = text + 'End date:' + this.mainRequest.endDate.toDateString() +  '<br><br>';
+      titleOfIntervales.innerHTML = text;
+      document.getElementById('intervalsPatients').appendChild(titleOfIntervales);
+      if (relevant.length === 0) {
+        const empty = document.createElement('h2');
+        empty.textContent = ' no intervals data for ' + name;
+        empty.style.height = '200px';
+        document.getElementById('timelinediv').appendChild(empty);
+
+      } else {
+        const intexp = document.createElement('h4');
+        intexp.textContent = this.sharedsrv.intervalExplanation(this.selectedPlan.icons[0]);
+        document.getElementById('timeline').appendChild(intexp);
+        google.charts.load('current', {'packages': ['corechart', 'timeline']});
+        google.charts.setOnLoadCallback(this.sharedsrv.drawTimeLine.bind(relevant));
+      }
+      this.loadingScreenService.stopLoading();
+      document.getElementById('timeline').hidden = true;
+      this.modeTimeline = false;
     });
   }
-  ngOnInit() {  }
+  ngAfterViewInit() {
+    this.sharedsrv.afterView();
+  }
+  public changeTime(isTime) {
+    this.modeTimeline = isTime;
+    if (!this.modeTimeline) {
+      document.getElementById('timelinediv').hidden = true;
+      document.getElementById('timeline').hidden = true;
+      document.getElementById('timelinediv').style.width = '100%';
+    } else {
+      document.getElementById('timelinediv').hidden = false;
+      document.getElementById('timeline').hidden = false;
+    }
+  }
+  ngOnInit() {
+    document.getElementById('barDiv').innerHTML = '';
+    this.loadingScreenService.stopLoading();
+  }
 }

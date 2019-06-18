@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import { map } from 'rxjs/operators';
+import {map, timeout} from 'rxjs/operators';
 import { Breakpoints, BreakpointState, BreakpointObserver } from '@angular/cdk/layout';
 import {DataRequest} from '../models/dataRequest';
 import {Plan} from '../models/plan';
@@ -23,92 +23,69 @@ export class SummaryDashboardComponent implements OnInit{
 
   public pageError = false;
   public mainRequest: DataRequest;
-  public checked = false;
   public mainPlan;
   title = 'app';
   public showIntervals = false;
   public colorsCompliance = [ {backgroundColor: ['#01b300', '#ed1d04']}];
-  public colorsConcepts = [ {backgroundColor: ['#51bcc2', '#d1a4c6', '#87cf78', '#d3a93e',
+  public colorsConcepts = [ {backgroundColor: ['#51bcc2', '#d1a4c6', '#87cf78', '#d3a93e', '#cf5800',
       '#d3a93e', '#d3a93e', '#d3a93e', '#d3a93e', '#d3a93e']}];
   public sumCompliance: PieChartData;
   public sumConcepts: BarChartData;
-  public tempPlan;
-  public tempRequest;
   constructor(private admDashService: AdmissionDashboardService, public basesrv: BaseServiceService,   private route: ActivatedRoute,
               private router: Router, private xmltosrv: XmlToObjectService,
               private sharedR: SharedRequestService, private objToChart: ObjectToChartService,     private loadingScreenService: LoadingScreenService) {
-    this.loadingScreenService.startLoading();
     this.mainRequest = this.sharedR.request.value;
     this.mainRequest.stage = 'Summary';
-    if (localStorage.getItem('summary') !== null) {
-      const data = JSON.parse(localStorage.getItem('summary'));
-      this.sumCompliance = this.objToChart.createPieChart(data.score);
-      // show every stage score
-      this.mainPlan = data.subPlans;
-      this.sumConcepts = this.objToChart.createBarChart(data.subPlans, this.mainRequest);
-    } else {
-    this.basesrv.getKnowledge(data => {
+      this.basesrv.getKnowledge(data => {
+      let sum = 0;
       const totalscore = [];
       this.mainPlan = this.xmltosrv.prepareXMLofKnowledge(data);
       for (let k = 0; k < this.mainPlan.length; k++) {
         if (localStorage.getItem(this.mainPlan[k].name) !== null) {
           totalscore.push({'name': this.mainPlan[k].name, 'weight': this.mainPlan[k].weight,
             'score': (JSON.parse(localStorage.getItem(this.mainPlan[k].name)).score )});
+          sum = sum + this.mainPlan[k].weight * parseFloat((JSON.parse(localStorage.getItem(this.mainPlan[k].name)).score ));
+          if (totalscore.length === 5) {
+            // timeout(3000);
+            localStorage.setItem('summary', JSON.stringify({name: 'summary', score: sum, subPlans: totalscore}));
+            this.sumCompliance = this.objToChart.createPieChart(sum);
+            this.sumConcepts = this.objToChart.createBarChart(totalscore, this.mainRequest);
+            this.loadingScreenService.stopLoading();
+          }
         } else {
-          // this.tempRequest = this.mainRequest;
-          // this.tempRequest.stage = this.mainPlan[k].name;
-          // this.basesrv.getCompliance(this.tempRequest, data1 => {
-          //   this.tempPlan = this.xmltosrv.prepareXMLofCompliance(data1);
-          //   if(this.tempPlan.score == -1) {
-          //     localStorage.setItem(this.tempPlan.name, 'no dada');
-          //     this.pageError = true;
-          //   } else {
-          //     localStorage.setItem(this.te, JSON.stringify(this.tempPlan));
-          //     this.checked = false;
-          //     totalscore.push({'name': this.tempPlan.name, 'weight': this.tempPlan.weight,
-          //       'score': (JSON.parse(localStorage.getItem(this.tempPlan.name)).score )});
-          //   }
-          // });
+          const tempRequest = this.mainRequest;
+          tempRequest.stage = this.mainPlan[k].name;
+            this.basesrv.getCompliance(tempRequest, data1 => {
+              const tempPlan = this.xmltosrv.prepareXMLofCompliance(data1);
+              if (tempPlan.score == -1) {
+                localStorage.setItem(tempPlan.name, 'no dada');
+                this.pageError = true;
+              } else {
+                localStorage.setItem(tempPlan.name, JSON.stringify(tempPlan));
+                const newOne = {
+                  'name': tempPlan.name, 'weight': tempPlan.weight,
+                  'score': (JSON.parse(localStorage.getItem(tempPlan.name)).score)
+                };
+                totalscore.push(newOne);
+                sum = sum + newOne.weight * newOne.score;
+              }
+              if (totalscore.length === 5) {
+                // timeout(3000);
+                localStorage.setItem('summary', JSON.stringify({name: 'summary', score: sum, subPlans: totalscore}));
+                this.sumCompliance = this.objToChart.createPieChart(sum);
+                this.sumConcepts = this.objToChart.createBarChart(totalscore, tempRequest);
+                this.loadingScreenService.stopLoading();
+              }
+            });
+            // setTimeout(4200);
         }
       }
-      // calc total score
-      let sum = 0;
-      for (let g = 0; g < totalscore.length; g++) {
-        sum = sum + totalscore[g].weight * totalscore[g].score;
-      }
-      localStorage.setItem('summary', JSON.stringify({name: 'summary', score: sum, subPlans: totalscore}));
-      this.sumCompliance = this.objToChart.createPieChart(sum);
-      // show every stage score
-      this.sumConcepts = this.objToChart.createBarChart(totalscore, this.mainRequest);
-      // save in local storage
     });
-    }
     console.log(this.mainPlan);
 
   }
-  callback(data){
-    // get the stage and
-    // this.loadscreenService.stopLoading();
-    this.mainPlan = this.xmltosrv.prepareXMLofCompliance(data);
-    if(this.mainPlan.score == -1){
-      this.pageError = true;
-      localStorage.setItem('followUp', 'no data');
-    } else {
-      localStorage.setItem('followUp', JSON.stringify(this.mainPlan));
-      console.log(this.mainPlan);
-      this.checked = false;
-      // create pie chart
-      // this.followUpCompliance = this.objToChart.createPieChart(this.mainPlan.score);
-      // create bar chart
-      // this.createBar(this.mainPlan.subPlans);
-      // this.followUpConcepts = this.objToChart.createBarChart(this.mainPlan.subPlans, this.mainRequest);
-    }
-
-    // totalscore.push({'name': this.mainPlan[k].name, 'weight': this.mainPlan[k].weight,
-    //   'score': (JSON.parse(localStorage.getItem(this.mainPlan[k].name)).score )});
-  }
   ngOnInit(): void {
-    this.loadingScreenService.stopLoading();
+    // this.loadingScreenService.stopLoading();
 
   }
 }

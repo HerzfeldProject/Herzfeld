@@ -34,3 +34,7 @@ div.google-visualization-tooltip{
   background: linear-gradient(120deg, rgb(30, 50, 230) 30%, rgb(90, 140, 250) 70%) !important;
   font-size: 10px !important;
 }
+
+.red {
+  background-color: rgba(164, 164, 164, 0.5);
+}
