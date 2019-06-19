@@ -24,6 +24,7 @@ import {Subscription} from 'rxjs';
 export class AdmissionDashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   sub: Subscription;
+  disableTimeline = false;
   sameChart = false;
   selectedPlan: Plan = null;
   modeTimeline = true;
@@ -48,6 +49,14 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit, OnDes
 
     this.sub = this.router.events.subscribe((e: any) => {
       this.loadingScreenService.startLoading();
+      this.sameChart = false;
+      this.modeTimeline = true;
+      this.endDrill = false;
+      this.detailText = '';
+      this.tempSubPlans = [];
+      this.levels = [];
+      this.levelOfDrillDown = 0;
+      document.getElementById('moreDetails').innerHTML = '';
       if (e instanceof NavigationEnd) {
         this.admissionCompliance = null;
         this.ngOnInit();
@@ -130,9 +139,7 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit, OnDes
       if (this.tempSubPlans[i].name == conceptName) {
         textToAdd = conceptName ;
         sub = this.tempSubPlans[i].subPlans;
-        if(sub.length > 1){
-          this.levelOfDrillDown++;
-        }
+        this.levelOfDrillDown++;
         if (this.tempSubPlans[i].score !== undefined) {
           this.endDrill = false;
           textToAdd = textToAdd + ' - ' + Number(this.tempSubPlans[i].score).toFixed(2);
@@ -140,7 +147,10 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit, OnDes
         if (this.tempSubPlans[i].conceptId !== undefined) {
           textToAdd = '<button title="Show Time Intervals" (click)="' +
             this.onConceptInterval( conceptName , this.tempSubPlans[i]) + '">' + textToAdd + '</button>';
+        } else {
+          this.onConceptInterval( conceptName , this.tempSubPlans[i]);
         }
+
         textToAdd = textToAdd + '<i class="fa fa-arrow-right"></i> ';
         this.detailText = this.detailText + textToAdd;
         break;
@@ -150,7 +160,6 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit, OnDes
     if (sub[0].score !== undefined) {
       this.createBar(sub);
       this.sameChart = false;
-      this.levelOfDrillDown++;
     } else {
       this.endDrill = true;
       this.sameChart = true;
@@ -175,7 +184,7 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit, OnDes
     this.loadingScreenService.stopLoading();
     this.mainPlan = this.xmltosrv.prepareXMLofCompliance(data);
     if(this.mainPlan.score == -1) {
-      localStorage.setItem('Admission', 'no dada');
+      localStorage.setItem('Admission', 'no data');
       this.pageError = true;
     } else {
       localStorage.setItem('Admission', JSON.stringify(this.mainPlan));
@@ -183,44 +192,58 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit, OnDes
       this.createBar(this.mainPlan.subPlans);
     }
     this.loadingScreenService.stopLoading();
-    Chart.afterDraw();
+    this.ngAfterViewInit();
   }
   onConceptInterval(name, plan) {
     document.getElementById('timelinediv').hidden = false;
     this.loadingScreenService.startLoading();
     this.selectedPlan = plan;
     document.getElementById('timeline').innerHTML = '';
+    ///
     const child = document.getElementById('intervalsPatients');
     child.innerHTML = '';
-    this.basesrv.getData(this.mainRequest, plan.conceptId, data => {
-      const temp = this.xmltosrv.prepareXMLofDATA(data);
-      let relevant = this.xmltosrv.createDataInstances(temp, this.mainRequest.startDate, this.mainRequest.endDate);
-      relevant = this.xmltosrv.combinIntervals(relevant);
-      const titleOfIntervales = document.createElement('h5');
-      titleOfIntervales.style.color = '#0071c5';
-      titleOfIntervales.style.fontSize = '20px';
-      let text = name + ' Compliance <br><br>';
-      text = text + 'Start date: ' + this.mainRequest.startDate.toDateString() + '<br><br>';
-      text = text + 'End date:' + this.mainRequest.endDate.toDateString() +  '<br><br>';
-      titleOfIntervales.innerHTML = text;
-      document.getElementById('intervalsPatients').appendChild(titleOfIntervales);
-      if (relevant.length === 0) {
-        const empty = document.createElement('h2');
-        empty.textContent = ' no intervals data for ' + name;
-        empty.style.height = '200px';
-        document.getElementById('timelinediv').appendChild(empty);
-
-      } else {
-        const intexp = document.createElement('h4');
-        intexp.textContent = this.sharedsrv.intervalExplanation(this.selectedPlan.icons[0]);
-        document.getElementById('timeline').appendChild(intexp);
-        google.charts.load('current', {'packages': ['corechart', 'timeline']});
-        google.charts.setOnLoadCallback(this.sharedsrv.drawTimeLine.bind(relevant));
-      }
-      this.loadingScreenService.stopLoading();
-      document.getElementById('timeline').hidden = true;
+    const titleOfIntervales = document.createElement('h5');
+    titleOfIntervales.style.color = '#0071c5';
+    titleOfIntervales.style.fontSize = '20px';
+    let text = name + ' Compliance <br><br>';
+    text = text + 'Start date: ' + this.mainRequest.startDate.toDateString() + '<br><br>';
+    text = text + 'End date:' + this.mainRequest.endDate.toDateString() +  '<br><br>';
+    titleOfIntervales.innerHTML = text;
+    document.getElementById('intervalsPatients').appendChild(titleOfIntervales);
+    ///
+    if(plan.conceptId === undefined){
       this.modeTimeline = false;
-    });
+      this.disableTimeline = true;
+      document.getElementById('timeline').hidden = true;
+      document.getElementById('timelinediv').hidden = true;
+      this.loadingScreenService.stopLoading();
+    } else {
+      this.disableTimeline = false;
+      this.basesrv.getData(this.mainRequest, plan.conceptId, data => {
+        const temp = this.xmltosrv.prepareXMLofDATA(data);
+        let relevant = this.xmltosrv.createDataInstances(temp, this.mainRequest.startDate, this.mainRequest.endDate);
+        relevant = this.xmltosrv.combinIntervals(relevant);
+
+        if (relevant.length === 0) {
+          const empty = document.createElement('h2');
+          empty.textContent = ' no intervals data for ' + name;
+          empty.style.height = '200px';
+          document.getElementById('timelinediv').appendChild(empty);
+          document.getElementById('timelinediv').hidden = true;
+
+        } else {
+          const intexp = document.createElement('h4');
+          intexp.textContent = this.sharedsrv.intervalExplanation(this.selectedPlan.icons[0]);
+          document.getElementById('timeline').appendChild(intexp);
+          google.charts.load('current', {'packages': ['corechart', 'timeline']});
+          google.charts.setOnLoadCallback(this.sharedsrv.drawTimeLine.bind(relevant));
+        }
+        this.loadingScreenService.stopLoading();
+        document.getElementById('timeline').hidden = true;
+        this.modeTimeline = false;
+      });
+    }
+
   }
   ngAfterViewInit() {
     this.sharedsrv.afterView();
@@ -239,17 +262,6 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit, OnDes
   ngOnInit() {
     this.mainRequest = this.sharedR.request.value;
     this.mainRequest.stage = 'Admission';
-    // if (localStorage.getItem('Admission') !== null) {
-    //   this.loadingScreenService.stopLoading();
-    //   if(localStorage.getItem('Admission') == 'no data'){
-    //     this.pageError = true;
-    //   } else {
-    //     this.mainPlan = JSON.parse(localStorage.getItem('Admission'));
-    //     console.log(this.mainPlan);
-    //     this.admissionCompliance = this.objToChart.createPieChart(this.mainPlan.score);
-    //     this.createBar(this.mainPlan.subPlans, false);
-    //   }
-    // } else {
     this.basesrv.getCompliance(this.mainRequest, this.callback.bind(this));
     document.getElementById('barDiv').innerHTML = '';
 

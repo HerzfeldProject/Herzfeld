@@ -36,64 +36,16 @@ export class ObjectToChartService {
     };
     return admissionCompliance;
   }
-  createBar(subPlans) {
-    const admissionConcepts = new BarChartData();
-    admissionConcepts.datasets = [{data: [], label: 'Completion percentages', metadata: [],
-      backgroundColor: ['#51bcc2', '#51bcc2', '#51bcc2', '#51bcc2', '#51bcc2', '#51bcc2']}];
-    admissionConcepts.labels = [];
-    for (let i = 0; i < subPlans.length; i++) {
-      admissionConcepts.labels.push(subPlans[i].name);
-      admissionConcepts.datasets[0].data.push(subPlans[i].score);
-      admissionConcepts.datasets[0].metadata.push(subPlans[i]);
-    }
-    admissionConcepts.options = {
-      tooltips: {
-        enabled: false,
-        custom: this.tooltipsrv.histogToolTip
-      },
-      // onClick: this.onDrillDown.bind(this),
-      responsive: true,
-      scaleShowVerticalLines: false,
-      scales: {
-        xAxes: [{
-          ticks: {
-            autoSkip: false
-          }
-        }
-        ],
-        yAxes: [{
-          ticks: {
-            beginAtZero: true,
-            suggestedMax: 1,
-          }
-        }]
-      },
-    };
-    const father = document.getElementById('barDiv');
-    father.innerHTML = '';
-    const canvas = <HTMLCanvasElement>document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const chart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: admissionConcepts.labels,
-        datasets: admissionConcepts.datasets,
-      },
-      options: admissionConcepts.options
-    });
-    father.appendChild(canvas);
-  }
 
   createBarChart(subPlans, mainReq) {
     this.mainPlan = subPlans;
     this.mainReq = mainReq;
     const admissionConcepts = new BarChartData();
-    admissionConcepts.datasets = [{data: [], label: 'Completion percentages', metadata: []}, {label: 'line', data: [], type: 'line'}];
+    admissionConcepts.datasets = [{data: [], label: 'Completion percentages', metadata: []}];
     admissionConcepts.labels = [];
     for (let i = 0; i < subPlans.length; i++) {
       admissionConcepts.labels.push(subPlans[i].name);
-      admissionConcepts.datasets[0].data.push(subPlans[i].score);
-      admissionConcepts.datasets[1].data.push(subPlans[i].score);
+      admissionConcepts.datasets[0].data.push(parseFloat(subPlans[i].score).toFixed(2));
       // admissionConcepts.datasets[0].metadata.push(subPlans[i].conceptId);
     }
     admissionConcepts.options = {
@@ -187,7 +139,11 @@ export class ObjectToChartService {
       const options = {
         height: 40 + (dataTable.getNumberOfRows() * 40),
         avoidOverlappingGridLines: true,
-        tooltip: {isHtml: true}
+        tooltip: {isHtml: true},
+        hAxis: {
+          minValue: new Date(new Date(this[0].startTime).getFullYear(), new Date(this[0].startTime).getMonth(), new Date(this[0].startTime).getDay() - 1),
+          maxValue: new Date(new Date(this[this.length - 1].endTime).getFullYear(), new Date(this[this.length].endTime).getMonth(), new Date(this[this.length].endTime).getDay() + 1),
+        }
       };
       // google.visualization.events.addListener(chart, 'onmouseover', myHandler);
       // google.visualization.events.addListener(chart, 'select', function () {

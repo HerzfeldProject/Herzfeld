@@ -79,7 +79,11 @@ export class SharedService {
       }
       let innerHtml = '<thead style="color: white; font-size: 18px">';
       innerHtml += '<tr><th>' + titleLines[0] + '</th></tr>';
-      innerHtml += '</thead><tbody style="font-size: 14px"><tr><th><span></span> score:' + parseFloat(myPlanMeta.score).toFixed(2) + '&nbsp;';
+      innerHtml += '</thead><tbody style="font-size: 14px">';
+      if(myPlanMeta.filter !== undefined){
+        innerHtml += '<tr><th><span></span> details:' + myPlanMeta.filter + '&nbsp;</th></tr>';
+      }
+      innerHtml += '<tr><th><span></span> score:' + parseFloat(myPlanMeta.score).toFixed(2) + '&nbsp;';
       if(myPlanMeta.icons.length > 0){
         innerHtml += iconToHtml(myPlanMeta.icons[0]) + '</th></tr>';
       } else {
@@ -130,11 +134,17 @@ export class SharedService {
           num = num.substring(0, 1);
         }
       }
-      // if(this[i].startTime === this[i].endTime){
-      //   dataTable.addRow([num, new Date(this[i].startTime), new Date(this[i].endTime+), createToolTip(this[i])]);
-      // }
-      dataTable.addRow([num, new Date(this[i].startTime), new Date(this[i].endTime), createToolTip(this[i])]);
+
+      // @ts-ignore
+      if(this.length === 1){
+        dataTable.addRow([num, new Date(new Date(this[0].startTime).getFullYear(), new Date(this[0].startTime).getMonth(), new Date(this[0].startTime).getDay(), new Date(this[0].startTime).getHours(), new Date(this[0].startTime).getMinutes(), new Date(this[0].startTime).getSeconds()),
+          new Date(new Date(this[0].startTime).getFullYear(), new Date(this[0].startTime).getMonth(), new Date(this[0].startTime).getDay(), new Date(this[0].startTime).getHours(), new Date(this[0].startTime).getMinutes(), new Date(this[0].startTime).getSeconds() + 1),
+          createToolTip(this[i])]);
+      } else {
+        dataTable.addRow([num, new Date(this[i].startTime), new Date(this[i].endTime), createToolTip(this[i])]);
+      }
     }
+
     let height = 0;
     const val = [];
     // @ts-ignore
@@ -151,14 +161,19 @@ export class SharedService {
     const options = {
       height: (50 + height) < 210 ? 210 :  (50 + height),
       avoidOverlappingGridLines: false,
-      tooltip: {isHtml: true}
+      tooltip: {isHtml: true},
+      // hAxis: {
+      //   minValue: new Date(new Date(this[0].startTime).getFullYear(), new Date(this[0].startTime).getMonth(), new Date(this[0].startTime).getDay() - 1),
+      //   // @ts-ignore
+      //   maxValue: new Date(new Date(this[this.length - 1].endTime).getFullYear(), new Date(this[this.length - 1].endTime).getMonth(), new Date(this[this.length - 1 ].endTime).getDay() + 1),
+      // }
     };
     function createToolTip(plantouse){
       const start =  new Date(plantouse.startTime);
       const end =  new Date(plantouse.endTime);
       return '<table> <thead style="color: white; font-size: 18px; font-weight: bold"><tr><td>Details: </td></tr></thead><tbody  style="color: white; size: 14px">' +
         '<tr><td><span></span>' + 'Patients id\'s:  ' + plantouse.entityId + '</td></tr>' +
-        '<tr><td><span></span>' + 'Score:  ' + parseFloat(plantouse.value).toFixed(1) + '</td></tr>' +
+        '<tr><td><span></span>' + 'Score:  ' + plantouse.value + '</td></tr>' +
         '<tr><td><span></span>' + 'Start Date:  ' + start.toDateString() + ' , ' + start.toTimeString() + '</td></tr>' +
         '<tr><td><span></span>' + 'End Date:  ' + end.toDateString() + ' , ' + end.toTimeString() + '</td></tr>' +
         '</tbody></table>';
@@ -176,7 +191,7 @@ export class SharedService {
     chart.draw(dataTable, options);
   }
   afterView(){
-    return Chart.pluginService.register({
+    return     Chart.pluginService.register({
       afterDraw: function (chart) {
         if (chart.config.options.elements.center) {
           const helpers = Chart.helpers;
@@ -195,7 +210,8 @@ export class SharedService {
           ctx.fillStyle = helpers.getValueOrDefault(chart.config.options.elements.center.fontColor, Chart.defaults.global.defaultFontColor);
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.fillText(chart.config.options.elements.center.text, centerX, centerY);
+          const val = parseFloat(chart.config.data.datasets[0].data[0]).toFixed(2);
+          ctx.fillText(Math.round(parseFloat(val) * 100) + '%', centerX, centerY);
           ctx.restore();
         }
       },

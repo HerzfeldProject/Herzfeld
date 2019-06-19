@@ -48,6 +48,9 @@ export class XmlToObjectService {
     if (start.attributes.concept_id !== undefined) {
       plan.conceptId = start.attributes.concept_id.nodeValue;
     }
+    if(start.attributes.filter !== undefined){
+      plan.filter = start.attributes.filter.nodeValue;
+    }
     plan.weight = start.attributes.weight.nodeValue;
     if (start.attributes.score !== undefined) {
       plan.score = start.attributes.score.nodeValue;

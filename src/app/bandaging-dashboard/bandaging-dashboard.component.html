@@ -27,7 +27,7 @@
         <mat-card-content class="col-lg-12 col-md-12">
           <div class="col-lg-3 col-md-3"><h5>
             Weight Distribution: <br><br>
-            <table style="font-weight: normal">
+            <table style="white-space: nowrap;font-weight: normal; font-size: 12px">
                 <tr *ngFor="let plan of mainPlan.subPlans"><th>{{plan.name}}</th><th>{{(plan.weight *100).toFixed(0)}}%</th></tr>
               <!--{{plan.name}} - {{plan.weight *100}} % <br>-->
             </table>
@@ -81,7 +81,7 @@
             <mat-sidenav style="outline: 1px solid dodgerblue;" mode="side" opened role="navigation">
               <mat-nav-list>
                 <a mat-list-item [ngClass]="{red: modeTimeline === false} " (click)="changeTime(false)">Patients Details</a>
-                <a mat-list-item [ngClass]="{red: modeTimeline === true}" (click)="changeTime(true)">TimeLine</a>
+                <a mat-list-item [ngStyle]="{'pointer-events':disableTimeline == false ?'auto':'none'}" [ngClass]="{red: modeTimeline === true}" (click)="changeTime(true)">TimeLine</a>
 
               </mat-nav-list>
             </mat-sidenav>

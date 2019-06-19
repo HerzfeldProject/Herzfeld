@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit} from '@angular/core';
 import { map } from 'rxjs/operators';
 import { Breakpoints, BreakpointState, BreakpointObserver } from '@angular/cdk/layout';
 import {DataRequest} from '../models/dataRequest';
@@ -7,20 +7,23 @@ import {PieChartData} from '../models/pieChartData';
 import {BarChartData} from '../models/barChartData';
 import {AdmissionDashboardService} from '../admission-dashboard/admission-dashboard.service';
 import {BaseServiceService} from '../services/baseService.service';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import {XmlToObjectService} from '../services/xml-to-object.service';
 import {SharedRequestService} from '../services/shared-request.service';
 import {ObjectToChartService} from '../services/object-to-chart.service';
 import {Chart} from 'chart.js';
 import {LoadingScreenService} from '../services/loading-screen.service';
 import {SharedService} from '../services/shared.service';
+import {Subscription} from 'rxjs';
 @Component({
   selector: 'app-prevention-dashboard',
   templateUrl: './prevention-dashboard.component.html',
   styleUrls: ['./prevention-dashboard.component.css']
 })
-export class PreventionDashboardComponent implements OnInit, AfterViewInit{
+export class PreventionDashboardComponent implements OnInit, AfterViewInit, OnDestroy{
 
+  sub: Subscription;
+  disableTimeline = false;
   sameChart = false;
   selectedPlan: Plan;
   modeTimeline = true;
@@ -44,9 +47,21 @@ export class PreventionDashboardComponent implements OnInit, AfterViewInit{
               private router: Router, private xmltosrv: XmlToObjectService,
               private sharedR: SharedRequestService, private objToChart: ObjectToChartService,
               private loadingScreenService: LoadingScreenService, private sharedsrv: SharedService) {
-    this.mainRequest = this.sharedR.request.value;
-    this.mainRequest.stage = 'Followup and Prevention';
-    this.basesrv.getCompliance(this.mainRequest, this.callback.bind(this));
+    this.sub = this.router.events.subscribe((e: any) => {
+      this.loadingScreenService.startLoading();
+      this.sameChart = false;
+      this.modeTimeline = true;
+      this.endDrill = false;
+      this.detailText = '';
+      this.tempSubPlans = [];
+      this.levels = [];
+      this.levelOfDrillDown = 0;
+      document.getElementById('moreDetails').innerHTML = '';
+      if (e instanceof NavigationEnd) {
+        this.prevCompliance = null;
+        this.ngOnInit();
+      }
+    });
   }
   createBar(subPlans) {
     this.tempSubPlans = subPlans;
@@ -124,9 +139,7 @@ export class PreventionDashboardComponent implements OnInit, AfterViewInit{
       if (this.tempSubPlans[i].name == conceptName) {
         textToAdd = conceptName ;
         sub = this.tempSubPlans[i].subPlans;
-        if(sub.length > 1){
-          this.levelOfDrillDown++;
-        }
+        this.levelOfDrillDown++;
         if (this.tempSubPlans[i].score !== undefined) {
           this.endDrill = false;
           textToAdd = textToAdd + ' - ' + Number(this.tempSubPlans[i].score).toFixed(2);
@@ -134,6 +147,8 @@ export class PreventionDashboardComponent implements OnInit, AfterViewInit{
         if (this.tempSubPlans[i].conceptId !== undefined) {
           textToAdd = '<button title="Show Time Intervals" (click)="' +
             this.onConceptInterval( conceptName , this.tempSubPlans[i]) + '">' + textToAdd + '</button>';
+        } else {
+          this.onConceptInterval( conceptName , this.tempSubPlans[i]);
         }
         textToAdd = textToAdd + '<i class="fa fa-arrow-right"></i> ';
         this.detailText = this.detailText + textToAdd;
@@ -144,7 +159,6 @@ export class PreventionDashboardComponent implements OnInit, AfterViewInit{
     if (sub[0].score !== undefined) {
       this.createBar(sub);
       this.sameChart = false;
-      this.levelOfDrillDown++;
     } else {
       this.endDrill = true;
       this.sameChart = true;
@@ -166,10 +180,9 @@ export class PreventionDashboardComponent implements OnInit, AfterViewInit{
   }
 
   callback(data){
-    this.loadingScreenService.stopLoading();
     this.mainPlan = this.xmltosrv.prepareXMLofCompliance(data);
     if(this.mainPlan.score == -1) {
-      localStorage.setItem('Followup and Prevention', 'no dada');
+      localStorage.setItem('Followup and Prevention', 'no data');
       this.pageError = true;
     } else {
       localStorage.setItem('Followup and Prevention', JSON.stringify(this.mainPlan));
@@ -180,43 +193,59 @@ export class PreventionDashboardComponent implements OnInit, AfterViewInit{
       // create bar chart
       this.createBar(this.mainPlan.subPlans);
     }
+    this.loadingScreenService.stopLoading();
   }
   onConceptInterval(name, plan) {
     document.getElementById('timelinediv').hidden = false;
     this.loadingScreenService.startLoading();
     this.selectedPlan = plan;
     document.getElementById('timeline').innerHTML = '';
+    ///
     const child = document.getElementById('intervalsPatients');
     child.innerHTML = '';
-    this.basesrv.getData(this.mainRequest, plan.conceptId, data => {
-      const temp = this.xmltosrv.prepareXMLofDATA(data);
-      let relevant = this.xmltosrv.createDataInstances(temp, this.mainRequest.startDate, this.mainRequest.endDate);
-      relevant = this.xmltosrv.combinIntervals(relevant);
-      const titleOfIntervales = document.createElement('h5');
-      titleOfIntervales.style.color = '#0071c5';
-      titleOfIntervales.style.fontSize = '20px';
-      let text = name + ' Compliance <br><br>';
-      text = text + 'Start date: ' + this.mainRequest.startDate.toDateString() + '<br><br>';
-      text = text + 'End date:' + this.mainRequest.endDate.toDateString() +  '<br><br>';
-      titleOfIntervales.innerHTML = text;
-      document.getElementById('intervalsPatients').appendChild(titleOfIntervales);
-      if (relevant.length === 0) {
-        const empty = document.createElement('h2');
-        empty.textContent = ' no intervals data for ' + name;
-        empty.style.height = '200px';
-        document.getElementById('timelinediv').appendChild(empty);
-
-      } else {
-        const intexp = document.createElement('h4');
-        intexp.textContent = this.sharedsrv.intervalExplanation(this.selectedPlan.icons[0]);
-        document.getElementById('timeline').appendChild(intexp);
-        google.charts.load('current', {'packages': ['corechart', 'timeline']});
-        google.charts.setOnLoadCallback(this.sharedsrv.drawTimeLine.bind(relevant));
-      }
-      this.loadingScreenService.stopLoading();
-      document.getElementById('timeline').hidden = true;
+    const titleOfIntervales = document.createElement('h5');
+    titleOfIntervales.style.color = '#0071c5';
+    titleOfIntervales.style.fontSize = '20px';
+    let text = name + ' Compliance <br><br>';
+    text = text + 'Start date: ' + this.mainRequest.startDate.toDateString() + '<br><br>';
+    text = text + 'End date:' + this.mainRequest.endDate.toDateString() +  '<br><br>';
+    titleOfIntervales.innerHTML = text;
+    document.getElementById('intervalsPatients').appendChild(titleOfIntervales);
+    ///
+    if(plan.conceptId === undefined){
       this.modeTimeline = false;
-    });
+      this.disableTimeline = true;
+      document.getElementById('timeline').hidden = true;
+      document.getElementById('timelinediv').hidden = true;
+      this.loadingScreenService.stopLoading();
+    } else {
+      this.disableTimeline = false;
+      this.basesrv.getData(this.mainRequest, plan.conceptId, data => {
+        const temp = this.xmltosrv.prepareXMLofDATA(data);
+        let relevant = this.xmltosrv.createDataInstances(temp, this.mainRequest.startDate, this.mainRequest.endDate);
+        relevant = this.xmltosrv.combinIntervals(relevant);
+
+        if (relevant.length === 0) {
+          const empty = document.createElement('h2');
+          empty.textContent = ' no intervals data for ' + name;
+          empty.style.height = '200px';
+          document.getElementById('timelinediv').appendChild(empty);
+          document.getElementById('timelinediv').hidden = true;
+
+
+        } else {
+          const intexp = document.createElement('h4');
+          intexp.textContent = this.sharedsrv.intervalExplanation(this.selectedPlan.icons[0]);
+          document.getElementById('timeline').appendChild(intexp);
+          google.charts.load('current', {'packages': ['corechart', 'timeline']});
+          google.charts.setOnLoadCallback(this.sharedsrv.drawTimeLine.bind(relevant));
+        }
+        this.loadingScreenService.stopLoading();
+        document.getElementById('timeline').hidden = true;
+        this.modeTimeline = false;
+      });
+    }
+
   }
   ngAfterViewInit() {
     this.sharedsrv.afterView();
@@ -233,7 +262,15 @@ export class PreventionDashboardComponent implements OnInit, AfterViewInit{
     }
   }
   ngOnInit() {
+    this.mainRequest = this.sharedR.request.value;
+    this.mainRequest.stage =   'Followup and Prevention';
+    this.basesrv.getCompliance(this.mainRequest, this.callback.bind(this));
     document.getElementById('barDiv').innerHTML = '';
-    this.loadingScreenService.stopLoading();
+
   }
+
+  ngOnDestroy(): void {
+    if (this.sub) {
+      this.sub.unsubscribe();
+    }  }
 }

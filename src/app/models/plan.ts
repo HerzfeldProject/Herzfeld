@@ -9,4 +9,5 @@ export class Plan {
   patientList0: string;
   patientListPart: string;
   icons: string[];
+  filter: string;
 }

@@ -31,5 +31,8 @@ export class NavComponent implements OnInit {
   ngOnInit(): void {
     console.log(this.mainRequest);
   }
+  startNav(){
+    this.loadingScreenService.startLoading();
+  }
   }
 

@@ -18,7 +18,7 @@ export class AppComponent implements OnInit {
   @Input() isLogin;
 
   constructor(private route: ActivatedRoute,
-              private router: Router){}
+              public router: Router){}
     ngOnInit() {
     }
     logout(){

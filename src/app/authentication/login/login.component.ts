@@ -32,15 +32,10 @@ export class LoginComponent implements OnInit {
     private basesrv: BaseServiceService,
     private loadingScreenService: LoadingScreenService
   ) {
-    // window.onbeforeunload = function (e) {
-    //     do {
-    //       this.loading = true;
-    //       this.basesrv.authenticate(this.user1, this.callback.bind(this));
-    //     } while (this.answer === null);
-    // }
   }
 
   ngOnInit() {
+    this.loadingScreenService.stopLoading();
     this.loginForm = this.formBuilder.group({
       username: ['', Validators.required],
       password: ['', Validators.required]
@@ -49,8 +44,8 @@ export class LoginComponent implements OnInit {
     // get return url from route parameters or default to '/'
     this.returnUrl = 'nav';
 
-    this.basesrv.getSubPlanes(function(data){
-      console.log(data)
+    this.basesrv.getSubPlanes(function(data) {
+      console.log(data);
     })
   }
 
@@ -76,9 +71,18 @@ export class LoginComponent implements OnInit {
           this.router.navigate([this.returnUrl]);
         this.loading = true;
       } else {
-        alert('error');
+          // let text = '';
+          // if(this.user1.username !== undefined){
+          //   text = 'User' + this.user1.username;
+          // }
+          // if(this.user1.password !== undefined){
+          //   text += 'With password '+ this.user1.password
+          // }
+          // text += 'doesn\'t exist';
+          // alert(text);
         this.userError = true;
       }
     }
+
   }
 }

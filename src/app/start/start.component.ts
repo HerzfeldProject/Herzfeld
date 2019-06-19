@@ -25,6 +25,8 @@ import {MatDialog} from '@angular/material';
 })
 export class StartComponent implements OnInit {
 
+  userError = false;
+  errorText = '';
   departmentAndPatients = [];
   selectedDepartment: string[] = [];
   mainRequest: DataRequest;
@@ -48,12 +50,14 @@ export class StartComponent implements OnInit {
     to: false
   };
   constructor(private valService: BaseServiceService,    private router: Router, private route: ActivatedRoute,
-              private _http: HttpClient, private dialog: MatDialog,  private basesrv: BaseServiceService, private xmltosrv: XmlToObjectService, private sharedR: SharedRequestService, private loadingScreenService: LoadingScreenService) {
+              private _http: HttpClient, private dialog: MatDialog,  private basesrv: BaseServiceService,
+              private xmltosrv: XmlToObjectService, private sharedR: SharedRequestService,
+              private loadingScreenService: LoadingScreenService) {
   }
   ngOnInit() {
     this.toDate = new Date();
     this.fromDate = new Date(2016, 1, 1);
-    this.basesrv.getDepartment(data =>{
+    this.basesrv.getDepartment(data => {
       this.departmentAndPatients = this.xmltosrv.prepareXMLofDepartmentWithPatints(data);
       this.department = this.xmltosrv.prepareXMLofDepartment(this.departmentAndPatients);
       this.basesrv.getPatients(data1 => {
@@ -99,22 +103,35 @@ export class StartComponent implements OnInit {
     }
   }
   Submit() {
-    this.loadingScreenService.startLoading();
-    localStorage.clear();
-    const request = new DataRequest();
-    if (this.selectedBase === '1') {
-      request.type = 1;
-    } else if (this.selectedBase === '2') {
-      request.type = 0;
-    }
-    request.patientsList = this.optionsModel;
-    request.startDate = this.fromDate;
-    request.endDate = this.toDate;
-    request.stage = 'followUp' ; // The first stage you want to see
-    this.mainRequest = request;
-    this.sharedR.changeRequest(request);
-    this.serched = false;
-    this.router.navigate(['nav/admission'], {queryParams: {title: this.mainRequest, si: true}});
 
-  }
+    if (this.selectedBase === undefined) {
+      this.userError = true;
+      this.errorText = 'You need to Pick Time Base/ Patients Base';
+    } else if (this.fromDate > this.toDate) {
+      this.userError = true;
+      this.errorText = 'Start Date Cant Be After End Date';
+    } else if (this.optionsModel.length === 0) {
+      this.userError = true;
+      this.errorText = 'Cant Submit without patients';
+    } else {
+      this.userError = false;
+        this.loadingScreenService.startLoading();
+        localStorage.clear();
+        const request = new DataRequest();
+        if (this.selectedBase === '1') {
+          request.type = 1;
+        } else if (this.selectedBase === '2') {
+          request.type = 0;
+        }
+        request.patientsList = this.optionsModel;
+        request.startDate = this.fromDate;
+        request.endDate = this.toDate;
+        request.stage = 'followUp' ; // The first stage you want to see
+        this.mainRequest = request;
+        this.sharedR.changeRequest(request);
+        this.serched = false;
+        this.router.navigate(['nav/admission'], {queryParams: {title: this.mainRequest, si: true}});
+      }
+
+    }
 }
