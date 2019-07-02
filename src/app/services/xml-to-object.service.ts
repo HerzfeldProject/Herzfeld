@@ -103,7 +103,7 @@ export class XmlToObjectService {
     const temp = [];
     if (data.length > 0) {
       for (let i = 0; i < data.length; i++) {
-        temp.push({dep: data.item(i).children[4].textContent,  patients: data.item(i).children[2].textContent});
+        temp.push({dep: data.item(i).childNodes[4].textContent,  patients: data.item(i).childNodes[2].textContent});
       }
     }
     return temp;

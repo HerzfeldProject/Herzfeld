@@ -65,7 +65,7 @@ export class LoginComponent implements OnInit {
     this.answer = data;
     this.loadingScreenService.stopLoading();
     if(this.answer !== null) {
-          this.answer = this.answer.getElementsByTagName('AuthenticateResult')[0].innerHTML;
+          this.answer = this.answer.getElementsByTagName('AuthenticateResult')[0].textContent;
         if (this.answer === 'true') {
           this.isLogin = true;
           this.router.navigate([this.returnUrl]);
