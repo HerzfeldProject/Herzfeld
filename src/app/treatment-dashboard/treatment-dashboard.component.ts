@@ -224,8 +224,8 @@ export class TreatmentDashboardComponent implements OnInit, AfterViewInit, OnDes
       this.disableTimeline = false;
       this.basesrv.getData(this.mainRequest, plan.conceptId, data => {
         const temp = this.xmltosrv.prepareXMLofDATA(data);
-        let relevant = this.xmltosrv.createDataInstances(temp, this.mainRequest.startDate, this.mainRequest.endDate);
-        relevant = this.xmltosrv.combinIntervals(relevant);
+        const relevant = this.xmltosrv.createDataInstances(temp, this.mainRequest.startDate, this.mainRequest.endDate);
+        // relevant = this.xmltosrv.combinIntervals(relevant);
 
         if (relevant.length === 0) {
           const empty = document.createElement('h2');

@@ -5,7 +5,7 @@ import {AdmissionDashboardService} from './admission-dashboard.service';
 import {BarChartData} from '../models/barChartData';
 import {Weights} from '../models/weights';
 import {BaseServiceService} from '../services/baseService.service';
-import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
+import {ActivatedRoute, Event, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router} from '@angular/router';
 import {XmlToObjectService} from '../services/xml-to-object.service';
 import {DataRequest} from '../models/dataRequest';
 import {SharedRequestService} from '../services/shared-request.service';
@@ -46,7 +46,6 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit, OnDes
               private router: Router, private xmltosrv: XmlToObjectService,
               private sharedR: SharedRequestService, private objToChart: ObjectToChartService,
               private loadingScreenService: LoadingScreenService, private sharedsrv: SharedService) {
-
     this.sub = this.router.events.subscribe((e: any) => {
       this.loadingScreenService.startLoading();
       this.sameChart = false;
@@ -221,8 +220,8 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit, OnDes
       this.disableTimeline = false;
       this.basesrv.getData(this.mainRequest, plan.conceptId, data => {
         const temp = this.xmltosrv.prepareXMLofDATA(data);
-        let relevant = this.xmltosrv.createDataInstances(temp, this.mainRequest.startDate, this.mainRequest.endDate);
-        relevant = this.xmltosrv.combinIntervals(relevant);
+        const relevant = this.xmltosrv.createDataInstances(temp, this.mainRequest.startDate, this.mainRequest.endDate);
+        // relevant = this.xmltosrv.combinIntervals(relevant);
 
         if (relevant.length === 0) {
           const empty = document.createElement('h2');

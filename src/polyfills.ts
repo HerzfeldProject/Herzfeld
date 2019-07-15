@@ -71,6 +71,31 @@ import 'web-animations-js';  // Run `npm install --save web-animations-js`.
  */
 // (window as any).__Zone_enable_cross_context_check = true;
 
+if (!String.prototype.includes) {
+  String.prototype.includes = function(search, start) {
+    'use strict';
+    if (typeof start !== 'number') {
+      start = 0;
+    }
+
+    if (start + search.length > this.length) {
+      return false;
+    } else {
+      return this.indexOf(search, start) !== -1;
+    }
+  };
+}
+if (!Array.prototype.includes) {
+  Object.defineProperty(Array.prototype, 'includes', {
+    enumerable: false,
+    value: function(obj) {
+      const newArr = this.filter(function(el) {
+        return el === obj;
+      });
+      return newArr.length > 0;
+    }
+  });
+}
 /***************************************************************************************************
  * Zone JS is required by default for Angular itself.
  */

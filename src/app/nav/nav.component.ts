@@ -8,7 +8,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {LoadingScreenService} from '../services/loading-screen.service';
 import {ProtocolModalComponent} from '../protocol-modal/protocol-modal.component';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Event, Router , NavigationCancel, NavigationEnd, NavigationError, NavigationStart} from '@angular/router';
 
 @Component({
   selector: 'app-nav',
@@ -19,17 +19,25 @@ import {ActivatedRoute} from '@angular/router';
 export class NavComponent implements OnInit {
   @Input() serched;
   @Input() mainRequest: DataRequest;
-
+  // ShowLoad = true;
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(
       map(result => result.matches)
     );
-  constructor(private breakpointObserver: BreakpointObserver,
-               private loadingScreenService: LoadingScreenService, private dialog: MatDialog, private route: ActivatedRoute) {
+  constructor(private breakpointObserver: BreakpointObserver, private router: Router,  private loadingScreenService: LoadingScreenService, private dialog: MatDialog, private route: ActivatedRoute) {
+    // this.router.events.subscribe((routerEvent: Event) => {
+    //   if(routerEvent instanceof NavigationStart){
+    //     this.ShowLoad = true;
+    //   }
+    //   if(routerEvent instanceof  NavigationEnd || routerEvent instanceof NavigationError || routerEvent instanceof NavigationCancel){
+    //     this.ShowLoad = false;
+    //   }
+    // })
   }
 
   ngOnInit(): void {
     console.log(this.mainRequest);
+    // this.router.navigate(['admission']);
   }
   startNav(){
     this.loadingScreenService.startLoading();
