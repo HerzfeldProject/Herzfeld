@@ -66,8 +66,8 @@ export class StartComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    this.toDate = new Date();
-    this.fromDate = new Date(2016, 1, 1);
+    this.toDate = new Date(2017, 11, 31);
+    this.fromDate = new Date(2017, 0, 1);
     this.basesrv.getDepartment(data => {
       this.departmentAndPatients = this.xmltosrv.prepareXMLofDepartmentWithPatints(data);
       this.department = this.xmltosrv.prepareXMLofDepartment(this.departmentAndPatients);

@@ -29,7 +29,8 @@
                             },
                             "src/styles.css",
                             "node_modules/bootstrap/dist/css/bootstrap.min.css",
-                            "node_modules/chart.js/dist/Chart.bundle.min.js"
+                            "node_modules/chart.js/dist/Chart.bundle.min.js",
+                            "node_modules/ng-pick-datetime/assets/style/picker.min.css"
                         ],
                         "scripts": []
                     },
@@ -42,7 +43,7 @@
                             "optimization": true,
                             "outputHashing": "all",
                             "sourceMap": false,
-                            "extractCss": true,
+                            "extractCss": false,
                             "namedChunks": false,
                             "aot": true,
                             "extractLicenses": true,
