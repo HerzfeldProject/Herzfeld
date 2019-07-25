@@ -19,6 +19,7 @@ import {ActivatedRoute, Event, Router , NavigationCancel, NavigationEnd, Navigat
 export class NavComponent implements OnInit {
   @Input() serched;
   @Input() mainRequest: DataRequest;
+  @Input() username: string;
   // ShowLoad = true;
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(

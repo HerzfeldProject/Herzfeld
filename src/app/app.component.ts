@@ -16,6 +16,7 @@ import {ActivatedRoute, Router, NavigationCancel, NavigationEnd, NavigationError
 export class AppComponent implements OnInit, AfterViewInit {
   title = 'Herzfeld';
   @Input() isLogin;
+  username: string;
 
   constructor(private route: ActivatedRoute,
               public router: Router){
@@ -24,7 +25,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
     logout(){
       this.isLogin = false;
-      this.router.navigate(['login']);
+      this.router.navigate(['login'], {queryParams: {user: 'eee'}});
     }
   ngAfterViewInit() {
     // this.router.events

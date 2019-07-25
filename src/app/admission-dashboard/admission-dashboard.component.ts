@@ -1,4 +1,4 @@
-import {Component, OnInit, AfterViewInit, Input, ViewChild, Output, OnDestroy} from '@angular/core';
+import {Component, OnInit, AfterViewInit, Input, ViewChild, Output, OnDestroy, isDevMode} from '@angular/core';
 import { Chart } from 'chart.js';
 import {PieChartData} from '../models/pieChartData';
 import {AdmissionDashboardService} from './admission-dashboard.service';
@@ -15,6 +15,8 @@ import {LoadingScreenService} from '../services/loading-screen.service';
 import {bind} from '@angular/core/src/render3/instructions';
 import {SharedService} from '../services/shared.service';
 import {Subscription} from 'rxjs';
+import {LogObject} from '../models/logObject';
+import {environment} from '../../environments/environment.prod';
 
 @Component({
   templateUrl: './admission-dashboard.component.html',
@@ -23,6 +25,7 @@ import {Subscription} from 'rxjs';
 })
 export class AdmissionDashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
+  private username: string;
   sub: Subscription;
   disableTimeline = false;
   sameChart = false;
@@ -61,6 +64,9 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit, OnDes
         this.ngOnInit();
       }
     });
+    this.route.queryParamMap.subscribe(params => {
+      this.username = params.params.user;
+    })
   }
   createBar(subPlans) {
     this.tempSubPlans = subPlans;
@@ -132,6 +138,12 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit, OnDes
       this.detailText = this.detailText.substring(0, this.detailText.lastIndexOf('<button'));
     }
     const conceptName = i[0]._model.label;
+    const log = new LogObject();
+    log.patiendID = this.username;
+    log.method = 'HERTZFELDBI';
+    log.conceptId = '00';
+    log.state = 'Click on Bars';
+    log.description = conceptName;
     let sub = [];
     let textToAdd = '';
     for (let i = 0; i < this.tempSubPlans.length; i++) {
@@ -144,6 +156,7 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit, OnDes
           textToAdd = textToAdd + ' - ' + Number(this.tempSubPlans[i].score).toFixed(2);
         }
         if (this.tempSubPlans[i].conceptId !== undefined) {
+          log.conceptId = this.tempSubPlans[i].conceptId;
           textToAdd = '<button title="Show Time Intervals" (click)="' +
             this.onConceptInterval( conceptName , this.tempSubPlans[i]) + '">' + textToAdd + '</button>';
         } else {
@@ -155,6 +168,11 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit, OnDes
         break;
       }
     }
+     if(environment.production) {
+      this.basesrv.writeLog(log, function () {
+        console.log('log click on bar success');
+      });
+     }
     document.getElementById('moreDetails').innerHTML = this.detailText;
     if (sub[0].score !== undefined) {
       this.createBar(sub);

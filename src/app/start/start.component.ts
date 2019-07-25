@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Input, OnInit, Output} from '@angular/core';
+import {AfterViewInit, Component, Input, isDevMode, OnInit, Output} from '@angular/core';
 import {BaseServiceService} from '../services/baseService.service';
 import {from, Observable} from 'rxjs';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
@@ -14,6 +14,9 @@ import {LoadingScreenService} from '../services/loading-screen.service';
 import {ActivatedRoute, Event, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router} from '@angular/router';
 import {ProtocolModalComponent} from '../protocol-modal/protocol-modal.component';
 import {MatDialog} from '@angular/material';
+import {LogObject} from '../models/logObject';
+import {User} from 'firebase';
+import {user} from '../models/user';
 // import {DataInstance} from '../models/dataInstance';
 // import {Plan} from '../models/plan';
 // import {parser} from 'xml2json';
@@ -26,6 +29,7 @@ import {MatDialog} from '@angular/material';
 export class StartComponent implements OnInit, AfterViewInit {
 
   // ShowLoad = true;
+  public username: string;
   userError = false;
   errorText = '';
   departmentAndPatients = [];
@@ -63,6 +67,9 @@ export class StartComponent implements OnInit, AfterViewInit {
     //     this.ShowLoad = false;
     //   }
     // })
+    this.route.queryParamMap.subscribe(params => {
+      this.username = params.params.title;
+    });
   }
 
   ngOnInit() {
@@ -131,11 +138,14 @@ export class StartComponent implements OnInit, AfterViewInit {
       this.userError = false;
       this.loadingScreenService.startLoading();
       localStorage.clear();
+      let dataBase = '';
       const request = new DataRequest();
       if (this.selectedBase === '1') {
         request.type = 1;
+        dataBase = 'TimeBase';
       } else if (this.selectedBase === '2') {
         request.type = 0;
+        dataBase = 'PatientsBase';
       }
       request.patientsList = this.optionsModel;
       request.startDate = this.fromDate;
@@ -144,7 +154,19 @@ export class StartComponent implements OnInit, AfterViewInit {
       this.mainRequest = request;
       this.sharedR.changeRequest(request);
       this.serched = false;
-      this.router.navigate(['nav/admission'], {queryParams: {title: this.mainRequest, si: true}});
+      if(!isDevMode()) {
+        const log = new LogObject();
+        log.patiendID = this.username;
+        log.method = 'HERTZFELDBI';
+        log.conceptId = '00';
+        log.state = 'Submit button press';
+        log.description = dataBase + ':' + request.startDate + ':' + request.endDate + ':' +
+          this.selectedDepartment.toString() + ':' + this.optionsModel.toString();
+        this.basesrv.writeLog(log, function () {
+          console.log('log Submit success');
+        });
+      }
+      this.router.navigate(['nav/admission'], {queryParams: {title: this.mainRequest, user: this.username, si: true}});
     }
 
   }

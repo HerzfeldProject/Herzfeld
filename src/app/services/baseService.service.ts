@@ -350,4 +350,52 @@ patientReplay(xmlreq, message, callback){
     };
     xmlreq.send(message);
   }
+
+
+  public writeLog(logObject, callback) {
+    const xmlreq = new XMLHttpRequest();
+    xmlreq.open('POST', 'http://medinfo2.ise.bgu.ac.il/MediatorNewTAK/queryDrivenAPI/queryDrivenAPI.svc', true);
+    xmlreq.setRequestHeader('Content-Type', 'text/xml;charset=utf-8');
+    xmlreq.responseType = 'document';
+
+    const message = '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">\n' +
+      '<s:Body>' +
+      '<WriteToLog xmlns="http://tempuri.org/">' +
+      '<patientID>' + logObject.patiendID + '</patientID>' +
+      '<method>' + logObject.method + '</method>' +
+      '<state>' + logObject.state + '</state>' +
+      '<conceptId>' + logObject.conceptId + '</conceptId>' +
+      '<description>' + logObject.description + '</description>' +
+      '</WriteToLog>' +
+      '</s:Body>' +
+      '</s:Envelope>';
+    xmlreq.setRequestHeader('SOAPAction', 'http://tempuri.org/IQueryDrivenAPI/WriteToLog');
+    xmlreq.onreadystatechange = function () {
+      if (xmlreq.readyState === 4) {
+        if (xmlreq.status === 200) {
+          console.log(xmlreq.responseXML);
+          callback.apply(this, [xmlreq.responseXML.getElementsByTagName('WriteToLogResult')]);
+          // xmlreq.abort();
+        } else {
+          this.logReplay(xmlreq, message, callback);
+        }
+      }
+    }.bind(this);
+    xmlreq.send(message);
+  }
+  logReplay(xmlreq, message, callback) {
+    xmlreq.open('POST', 'http://medinfo2.ise.bgu.ac.il/MediatorNewTAK/queryDrivenAPI/queryDrivenAPI.svc', true);
+    xmlreq.setRequestHeader('Content-Type', 'text/xml;charset=utf-8');
+    xmlreq.responseType = 'document';
+    xmlreq.setRequestHeader('SOAPAction', 'http://tempuri.org/IQueryDrivenAPI/WriteToLog');
+    xmlreq.onreadystatechange = function () {
+      if (xmlreq.readyState === 4) {
+        if (xmlreq.status === 200) {
+          callback.apply(this, [xmlreq.responseXML.getElementsByTagName('WriteToLogResult')]);
+          // xmlreq.abort();
+        }
+      }
+    };
+    xmlreq.send(message);
+  }
   }

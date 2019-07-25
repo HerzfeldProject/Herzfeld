@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit, Output} from '@angular/core';
+import {Component, HostListener, isDevMode, OnInit, Output} from '@angular/core';
 
 import {Router, ActivatedRoute, RouterEvent, NavigationStart, NavigationEnd, NavigationCancel, NavigationError} from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -6,6 +6,8 @@ import { first } from 'rxjs/operators';
 import {BaseServiceService} from '../../services/baseService.service';
 import {user} from '../../models/user';
 import {LoadingScreenService} from '../../services/loading-screen.service';
+import {LogObject} from '../../models/logObject';
+import {log} from 'util';
 // import {AlertService} from '../../services/alert.service';
 // import {AuthenticationService} from '../../services/authentication.service';
 // import { AlertService, AuthenticationService } from '@/_services';
@@ -68,18 +70,20 @@ export class LoginComponent implements OnInit {
           this.answer = this.answer.getElementsByTagName('AuthenticateResult')[0].textContent;
         if (this.answer === 'true') {
           this.isLogin = true;
-          this.router.navigate([this.returnUrl]);
+          if(!isDevMode()) {
+            const log = new LogObject();
+            log.patiendID = '00';
+            log.method = 'HERTZFELDBI';
+            log.conceptId = '00';
+            log.state = 'LOGIN';
+            log.description = this.user1.username;
+            this.basesrv.writeLog(log, function () {
+              console.log('log login success');
+            });
+          }
+          this.router.navigate([this.returnUrl], { queryParams: { title: this.user1.username, si: true } });
         this.loading = true;
       } else {
-          // let text = '';
-          // if(this.user1.username !== undefined){
-          //   text = 'User' + this.user1.username;
-          // }
-          // if(this.user1.password !== undefined){
-          //   text += 'With password '+ this.user1.password
-          // }
-          // text += 'doesn\'t exist';
-          // alert(text);
         this.userError = true;
       }
     }
