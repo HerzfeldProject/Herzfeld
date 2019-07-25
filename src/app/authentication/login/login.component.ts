@@ -70,18 +70,18 @@ export class LoginComponent implements OnInit {
           this.answer = this.answer.getElementsByTagName('AuthenticateResult')[0].textContent;
         if (this.answer === 'true') {
           this.isLogin = true;
-          if(!isDevMode()) {
-            const log = new LogObject();
-            log.patiendID = '00';
-            log.method = 'HERTZFELDBI';
-            log.conceptId = '00';
-            log.state = 'LOGIN';
-            log.description = this.user1.username;
-            this.basesrv.writeLog(log, function () {
+          // if(!isDevMode()) {
+            const loginlog = new LogObject();
+          loginlog.patiendID = '00';
+          loginlog.method = 'HERTZFELDBI';
+          loginlog.conceptId = '00';
+          loginlog.state = 'LOGIN';
+          loginlog.description = this.user1.username;
+            this.basesrv.writeLog(loginlog, function () {
               console.log('log login success');
             });
-          }
-          this.router.navigate([this.returnUrl], { queryParams: { title: this.user1.username, si: true } });
+          // }
+          this.router.navigate([this.returnUrl], { queryParams: { user: this.user1.username, si: true } });
         this.loading = true;
       } else {
         this.userError = true;

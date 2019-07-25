@@ -26,14 +26,9 @@ export class NavComponent implements OnInit {
       map(result => result.matches)
     );
   constructor(private breakpointObserver: BreakpointObserver, private router: Router,  private loadingScreenService: LoadingScreenService, private dialog: MatDialog, private route: ActivatedRoute) {
-    // this.router.events.subscribe((routerEvent: Event) => {
-    //   if(routerEvent instanceof NavigationStart){
-    //     this.ShowLoad = true;
-    //   }
-    //   if(routerEvent instanceof  NavigationEnd || routerEvent instanceof NavigationError || routerEvent instanceof NavigationCancel){
-    //     this.ShowLoad = false;
-    //   }
-    // })
+    this.route.queryParams.subscribe(params => {
+      this.username = params.user;
+    });
   }
 
   ngOnInit(): void {

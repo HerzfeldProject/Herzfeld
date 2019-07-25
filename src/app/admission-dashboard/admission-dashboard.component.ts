@@ -25,6 +25,7 @@ import {environment} from '../../environments/environment.prod';
 })
 export class AdmissionDashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
+  preveousType: string;
   private username: string;
   sub: Subscription;
   disableTimeline = false;
@@ -49,6 +50,7 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit, OnDes
               private router: Router, private xmltosrv: XmlToObjectService,
               private sharedR: SharedRequestService, private objToChart: ObjectToChartService,
               private loadingScreenService: LoadingScreenService, private sharedsrv: SharedService) {
+    this.preveousType = '00';
     this.sub = this.router.events.subscribe((e: any) => {
       this.loadingScreenService.startLoading();
       this.sameChart = false;
@@ -64,9 +66,18 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit, OnDes
         this.ngOnInit();
       }
     });
-    this.route.queryParamMap.subscribe(params => {
-      this.username = params.params.user;
-    })
+    this.route.queryParams.subscribe(params => {
+      this.username =  params.user;
+    });
+    const stageLog = new LogObject();
+    stageLog.conceptId = '00';
+    stageLog.patiendID = this.username;
+    stageLog.method = 'HERTZFELDBI';
+    stageLog.state = 'Click on Stage';
+    stageLog.description = 'admission';
+    this.basesrv.writeLog(stageLog, function () {
+      console.log('log stage success');
+    });
   }
   createBar(subPlans) {
     this.tempSubPlans = subPlans;
@@ -168,11 +179,9 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit, OnDes
         break;
       }
     }
-     if(environment.production) {
       this.basesrv.writeLog(log, function () {
         console.log('log click on bar success');
       });
-     }
     document.getElementById('moreDetails').innerHTML = this.detailText;
     if (sub[0].score !== undefined) {
       this.createBar(sub);
@@ -183,17 +192,44 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit, OnDes
     }
   }
   onDrillUp(){
+    let templog = '';
     this.levelOfDrillDown --;
     if (this.levelOfDrillDown === 0) {
+      if(this.detailText.startsWith('<')) {
+        templog = this.detailText;
+        templog = templog.substring(templog.indexOf('>') + 1);
+      }
+      templog = this.detailText.substring(0, this.detailText.indexOf('-'));
       this.endDrill = false;
       this.detailText = '';
     }    else {
       const lastArrow = this.detailText.lastIndexOf('<i class="fa fa-arrow-right"></i>');
       const oneBefore = this.detailText.substring(0, lastArrow).lastIndexOf('<i class="fa fa-arrow-right"></i>');
+      templog = this.detailText.substring(lastArrow + 33 , oneBefore);
+      while ( templog.trim().startsWith('<')) {
+        templog = templog.substring(templog.indexOf('>') + 1);
+      }
+      templog = templog.substring(0, templog.indexOf('-'));
       this.detailText = this.detailText.substring(0, oneBefore + 33);
     }
+    const OutLog = new LogObject();
+    OutLog.patiendID = this.username;
+    OutLog.state = 'Click Back';
+    OutLog.method = 'HERTZFELDBI';
+    OutLog.description = templog.trim();
+    OutLog.conceptId = '00';
     document.getElementById('moreDetails').innerHTML = this.detailText;
     const temp = this.levels.pop();
+    for (let k = 0; k < temp.length; k++) {
+      if(OutLog.description === temp[k].name){
+        if(temp[k].conceptId !== undefined){
+          OutLog.conceptId = temp[k].conceptId;
+        }
+      }
+    }
+    this.basesrv.writeLog(OutLog, function () {
+      console.log('Out log success');
+    });
     this.createBar(temp);
   }
 
@@ -274,6 +310,7 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit, OnDes
     } else {
       document.getElementById('timelinediv').hidden = false;
       document.getElementById('timeline').hidden = false;
+      this.openPatientsOrTimeline('Timeline');
     }
   }
   ngOnInit() {
@@ -284,6 +321,18 @@ export class AdmissionDashboardComponent implements OnInit, AfterViewInit, OnDes
 
   }
 
+  openPatientsOrTimeline(type){
+    const downLog = new LogObject();
+    downLog.conceptId = this.preveousType;
+    downLog.patiendID = this.username;
+    downLog.method = 'HERTZFELDBI';
+    downLog.state = 'Click bottom';
+    downLog.description = type;
+    this.preveousType = type;
+    this.basesrv.writeLog(downLog, function () {
+      console.log('log bottom success');
+    });
+  }
   ngOnDestroy(): void {
     if (this.sub) {
       this.sub.unsubscribe();

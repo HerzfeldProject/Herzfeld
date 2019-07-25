@@ -67,8 +67,8 @@ export class StartComponent implements OnInit, AfterViewInit {
     //     this.ShowLoad = false;
     //   }
     // })
-    this.route.queryParamMap.subscribe(params => {
-      this.username = params.params.title;
+    this.route.queryParams.subscribe(params => {
+      this.username = params.user;
     });
   }
 
@@ -154,7 +154,7 @@ export class StartComponent implements OnInit, AfterViewInit {
       this.mainRequest = request;
       this.sharedR.changeRequest(request);
       this.serched = false;
-      if(!isDevMode()) {
+     // if(!isDevMode()) {
         const log = new LogObject();
         log.patiendID = this.username;
         log.method = 'HERTZFELDBI';
@@ -165,7 +165,7 @@ export class StartComponent implements OnInit, AfterViewInit {
         this.basesrv.writeLog(log, function () {
           console.log('log Submit success');
         });
-      }
+    //  }
       this.router.navigate(['nav/admission'], {queryParams: {title: this.mainRequest, user: this.username, si: true}});
     }
 

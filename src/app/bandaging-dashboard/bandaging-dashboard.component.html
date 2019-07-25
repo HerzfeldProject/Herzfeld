@@ -91,7 +91,7 @@
               <div id="timeline"></div>
               <div *ngIf="!modeTimeline">
                 <mat-accordion>
-                  <mat-expansion-panel style="background-color: rgba(3,255,22,0.56) ">
+                  <mat-expansion-panel style="background-color: rgba(3,255,22,0.56) " (opened)="openPatientsOrTimeline('green')">
                     <mat-expansion-panel-header>
                       <mat-panel-title>
                         Patient with 100% score
@@ -103,7 +103,7 @@
                     <div>{{selectedPlan.patientList100}}</div>
                   </mat-expansion-panel >
 
-                  <mat-expansion-panel style="background-color: rgba(247,255,0,0.56)">
+                  <mat-expansion-panel style="background-color: rgba(247,255,0,0.56)" (opened)="openPatientsOrTimeline('yellow')">
                     <mat-expansion-panel-header>
                       <mat-panel-title>
                         Patient with partial score
@@ -114,7 +114,7 @@
                     </mat-expansion-panel-header>
                     <div>{{selectedPlan.patientListPart}}</div>
                   </mat-expansion-panel>
-                  <mat-expansion-panel style="background-color: rgba(255,35,0,0.56)">
+                  <mat-expansion-panel style="background-color: rgba(255,35,0,0.56)" (opened)="openPatientsOrTimeline('red')">
                     <mat-expansion-panel-header>
                       <mat-panel-title>
                         Patient with 0% score

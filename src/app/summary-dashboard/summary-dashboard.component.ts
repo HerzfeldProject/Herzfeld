@@ -13,6 +13,7 @@ import {SharedRequestService} from '../services/shared-request.service';
 import {ObjectToChartService} from '../services/object-to-chart.service';
 import {LoadingScreenService} from '../services/loading-screen.service';
 import {Subscription} from 'rxjs';
+import {LogObject} from '../models/logObject';
 
 @Component({
   selector: 'app-summary-dashboard',
@@ -21,6 +22,7 @@ import {Subscription} from 'rxjs';
 })
 export class SummaryDashboardComponent implements OnInit{
 
+  private username: string;
   sub: Subscription;
   public stageNoData = [];
   public pageError = false;
@@ -41,6 +43,18 @@ export class SummaryDashboardComponent implements OnInit{
     this.pageError = false;
       this.loadingScreenService.startLoading();
       this.init();
+    });
+    this.route.queryParams.subscribe(params => {
+      this.username = params.user;
+    });
+    const stageLog = new LogObject();
+    stageLog.conceptId = '00';
+    stageLog.patiendID = this.username;
+    stageLog.method = 'HERTZFELDBI';
+    stageLog.state = 'Click on Stage';
+    stageLog.description = 'Summary';
+    this.basesrv.writeLog(stageLog, function () {
+      console.log('log stage success');
     });
   }
   init(){

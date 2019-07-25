@@ -13,6 +13,7 @@ import {ObjectToChartService} from '../services/object-to-chart.service';
 import {LoadingScreenService} from '../services/loading-screen.service';
 import {SharedService} from '../services/shared.service';
 import {Subscription} from 'rxjs';
+import {LogObject} from '../models/logObject';
 @Component({
   selector: 'app-bandaging-dashboard',
   templateUrl: './bandaging-dashboard.component.html',
@@ -20,6 +21,8 @@ import {Subscription} from 'rxjs';
 })
 export class BandagingDashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
+  preveousType: string;
+  private username: string;
   sub: Subscription;
   disableTimeline = false;
   sameChart = false;
@@ -46,6 +49,7 @@ export class BandagingDashboardComponent implements OnInit, AfterViewInit, OnDes
               private router: Router, private xmltosrv: XmlToObjectService,
               private sharedR: SharedRequestService, private objToChart: ObjectToChartService,
               private loadingScreenService: LoadingScreenService, private sharedsrv: SharedService) {
+    this.preveousType = '00';
     this.sub = this.router.events.subscribe((e: any) => {
       this.loadingScreenService.startLoading();
       this.sameChart = false;
@@ -60,6 +64,18 @@ export class BandagingDashboardComponent implements OnInit, AfterViewInit, OnDes
         this.bandCompliance = null;
         this.ngOnInit();
       }
+    });
+    this.route.queryParams.subscribe(params => {
+      this.username =  params.user;
+    });
+    const stageLog = new LogObject();
+    stageLog.conceptId = '00';
+    stageLog.patiendID = this.username;
+    stageLog.method = 'HERTZFELDBI';
+    stageLog.state = 'Click on Stage';
+    stageLog.description = 'bandage';
+    this.basesrv.writeLog(stageLog, function () {
+      console.log('log stage success');
     });
   }
   createBar(subPlans) {
@@ -132,6 +148,12 @@ export class BandagingDashboardComponent implements OnInit, AfterViewInit, OnDes
       this.detailText = this.detailText.substring(0, this.detailText.lastIndexOf('<button'));
     }
     const conceptName = i[0]._model.label;
+    const log = new LogObject();
+    log.patiendID = this.username;
+    log.method = 'HERTZFELDBI';
+    log.conceptId = '00';
+    log.state = 'Click on Bars';
+    log.description = conceptName;
     let sub = [];
     let textToAdd = '';
     for (let i = 0; i < this.tempSubPlans.length; i++) {
@@ -144,6 +166,7 @@ export class BandagingDashboardComponent implements OnInit, AfterViewInit, OnDes
           textToAdd = textToAdd + ' - ' + Number(this.tempSubPlans[i].score).toFixed(2);
         }
         if (this.tempSubPlans[i].conceptId !== undefined) {
+          log.conceptId = this.tempSubPlans[i].conceptId;
           textToAdd = '<button title="Show Time Intervals" (click)="' +
             this.onConceptInterval( conceptName , this.tempSubPlans[i]) + '">' + textToAdd + '</button>';
         } else {
@@ -154,6 +177,9 @@ export class BandagingDashboardComponent implements OnInit, AfterViewInit, OnDes
         break;
       }
     }
+    this.basesrv.writeLog(log, function () {
+      console.log('log click on bar success');
+    });
     document.getElementById('moreDetails').innerHTML = this.detailText;
     if (sub[0].score !== undefined) {
       this.createBar(sub);
@@ -164,17 +190,44 @@ export class BandagingDashboardComponent implements OnInit, AfterViewInit, OnDes
     }
   }
   onDrillUp(){
+    let templog = '';
     this.levelOfDrillDown --;
     if (this.levelOfDrillDown === 0) {
+      if(this.detailText.startsWith('<')) {
+        templog = this.detailText;
+        templog = templog.substring(templog.indexOf('>') + 1);
+      }
+      templog = this.detailText.substring(0, this.detailText.indexOf('-'));
       this.endDrill = false;
       this.detailText = '';
     }    else {
       const lastArrow = this.detailText.lastIndexOf('<i class="fa fa-arrow-right"></i>');
       const oneBefore = this.detailText.substring(0, lastArrow).lastIndexOf('<i class="fa fa-arrow-right"></i>');
+      templog = this.detailText.substring(lastArrow + 33 , oneBefore);
+      while ( templog.trim().startsWith('<')) {
+        templog = templog.substring(templog.indexOf('>') + 1);
+      }
+      templog = templog.substring(0, templog.indexOf('-'));
       this.detailText = this.detailText.substring(0, oneBefore + 33);
     }
+    const OutLog = new LogObject();
+    OutLog.patiendID = this.username;
+    OutLog.state = 'Click Back';
+    OutLog.method = 'HERTZFELDBI';
+    OutLog.description = templog.trim();
+    OutLog.conceptId = '00';
     document.getElementById('moreDetails').innerHTML = this.detailText;
     const temp = this.levels.pop();
+    for (let k = 0; k < temp.length; k++) {
+      if(OutLog.description === temp[k].name){
+        if(temp[k].conceptId !== undefined){
+          OutLog.conceptId = temp[k].conceptId;
+        }
+      }
+    }
+    this.basesrv.writeLog(OutLog, function () {
+      console.log('Out log success');
+    });
     this.createBar(temp);
   }
 
@@ -258,6 +311,7 @@ export class BandagingDashboardComponent implements OnInit, AfterViewInit, OnDes
     } else {
       document.getElementById('timelinediv').hidden = false;
       document.getElementById('timeline').hidden = false;
+      this.openPatientsOrTimeline('Timeline');
     }
   }
   ngOnInit() {
@@ -266,6 +320,18 @@ export class BandagingDashboardComponent implements OnInit, AfterViewInit, OnDes
     this.basesrv.getCompliance(this.mainRequest, this.callback.bind(this));
     document.getElementById('barDiv').innerHTML = '';
 
+  }
+  openPatientsOrTimeline(type){
+    const downLog = new LogObject();
+    downLog.conceptId = this.preveousType;
+    downLog.patiendID = this.username;
+    downLog.method = 'HERTZFELDBI';
+    downLog.state = 'Click bottom';
+    downLog.description = type;
+    this.preveousType = type;
+    this.basesrv.writeLog(downLog, function () {
+      console.log('log bottom success');
+    });
   }
 
   ngOnDestroy(): void {
